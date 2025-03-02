@@ -147,13 +147,6 @@
       }, 5000);
     }
 
-    function changeTitle() {
-      const titles = ["Doppelgänger", "¿Quién está ahí?", "ERROR 404", "Tu reflejo", "Veo todo", "666" ];
-      titleEl.innerText = titles[Math.floor(Math.random() * titles.length)];
-    }
-
-    setInterval(changeTitle, 3000);
-
     function addMessage(text, sender) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
