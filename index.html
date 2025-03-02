@@ -1,104 +1,232 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doppelgänger en Acción</title>
-    <style>
-        body {
-            background-color: #111;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .chat-container {
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #222;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        }
-        .messages {
-            height: 300px;
-            overflow-y: auto;
-            border-bottom: 1px solid #444;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-        .message {
-            padding: 5px;
-            border-radius: 5px;
-            margin: 5px;
-        }
-        .user {
-            background-color: #007bff;
-            text-align: right;
-            color: white;
-        }
-        .bot {
-            background-color: #dc3545;
-            text-align: left;
-            color: white;
-        }
-        input {
-            width: 70%;
-            padding: 8px;
-            border-radius: 5px;
-            border: none;
-        }
-        button {
-            padding: 8px;
-            border-radius: 5px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doppelgänger Mejorado</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: white;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      transition: background 1s ease-in-out, filter 0.5s;
+      overflow: hidden;
+    }
+    h1 {
+      text-shadow: 2px 2px 5px red, -2px -2px 5px blue;
+      animation: glitch 0.1s infinite alternate;
+      margin-top: 20px;
+    }
+    .chat-container {
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.85);
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    }
+    .messages {
+      height: 300px;
+      overflow-y: auto;
+      border-bottom: 1px solid red;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    .message {
+      padding: 10px;
+      border-radius: 5px;
+      margin: 5px;
+      font-size: 1rem;
+      width: fit-content;
+    }
+    .user {
+      background-color: #007bff;
+      text-align: right;
+      color: white;
+      margin-left: auto;
+    }
+    .bot {
+      background-color: #dc3545;
+      text-align: left;
+      color: white;
+      margin-right: auto;
+    }
+    .inputs {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      margin-bottom: 5px;
+    }
+    input, button {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid red;
+      background: black;
+      color: white;
+      font-family: inherit;
+    }
+    .footer {
+      font-size: 0.8rem;
+      margin-top: 10px;
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
+  <h1>Doppelgänger Mejorado</h1>
 
-    <h1>🌀 Doppelgänger en Acción</h1>
-    <div class="chat-container">
-        <div class="messages" id="messages"></div>
-        <input type="text" id="userInput" placeholder="Habla con tu sombra...">
-        <button onclick="sendMessage()">Enviar</button>
+  <main class="chat-container">
+    <div class="messages" id="messages" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="inputs">
+      <input type="text" id="userInput" placeholder="Escribe tu mensaje..." autocomplete="off" />
+      <button id="sendButton">Enviar</button>
     </div>
 
-    <script>
-        const responses = [
-            "¿Salvarlo de qué… o de quién?", 
-            "¿Y si el problema real es que el mundo no quiere ser salvado?", 
-            "Tal vez este héroe sea su propio villano sin darse cuenta.",
-            "¿Cada acto heroico lo acerca a la destrucción?", 
-            "¿O acaso es solo un egoísta disfrazado de salvador?"
-        ];
+    <div class="footer">Chat de horror interactivo</div>
+  </main>
 
-        function sendMessage() {
-            const input = document.getElementById("userInput");
-            const messageText = input.value.trim();
-            if (messageText === "") return;
+  <script>
+    /* ================================
+       Variables y Configuración
+    ================================ */
+    const messagesEl = document.getElementById("messages");
+    const userInputEl = document.getElementById("userInput");
+    const sendButtonEl = document.getElementById("sendButton");
 
-            addMessage(messageText, "user");
+    let gameState = 0;  
+    let userName = "";
+    let fearLevel = 0;
+    let inventory = { flashlight: false };
+    let messageCount = 0;
+    const MAX_MESSAGES = 20; 
 
-            setTimeout(() => {
-                const botMessage = responses[Math.floor(Math.random() * responses.length)];
-                addMessage(botMessage, "bot");
-            }, 1000);
+    // Comandos para avanzar en la historia
+    const commands = {
+      mirror: ["mirar espejo", "examinar espejo", "ver espejo"],
+      light: ["encender luz", "buscar interruptor"],
+      back: ["retroceder", "volver"],
+      pickUpFlashlight: ["coger linterna", "tomar linterna"],
+      door: ["abrir puerta", "examinar puerta"],
+    };
 
-            input.value = "";
+    // Mensajes aleatorios de horror
+    const horrorMessages = [
+      "Las sombras se mueven sin tu permiso.",
+      "Un eco distante repite tu nombre.",
+      "Sientes un escalofrío recorriendo tu espalda...",
+      "Hay un reflejo que parpadea sin que tú lo hagas.",
+    ];
+
+    /* ================================
+       Listeners Principales
+    ================================ */
+    sendButtonEl.addEventListener("click", sendMessage);
+    userInputEl.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    });
+
+    /* ================================
+       Función Principal del Chat
+    ================================ */
+    function sendMessage() {
+      const messageText = userInputEl.value.trim();
+      if (messageText === "") return;
+
+      addMessage(messageText, "user");
+      userInputEl.value = "";
+
+      setTimeout(() => {
+        const botResponse = generateResponse(messageText);
+        addMessage(botResponse, "bot");
+      }, 500 + Math.random() * 1000);
+    }
+
+    function generateResponse(userMessage) {
+      messageCount++;
+
+      if (fearLevel >= 10) {
+        triggerEnd("El Doppelgänger toma tu cuerpo...");
+        return "…";
+      }
+
+      if (messageCount > MAX_MESSAGES) {
+        triggerEnd("El número de susurros es demasiado. El Doppelgänger despierta...");
+        return "…";
+      }
+
+      if (gameState === 0) {
+        userName = userMessage;
+        gameState = 1;
+        return `Bienvenido, ${userName}. Una sombra observa desde el espejo... Es difícil distinguir su rostro. ¿Te acercas al espejo o buscas una luz?`;
+      }
+
+      if (gameState === 1) {
+        if (checkCommand(userMessage, commands.mirror)) {
+          fearLevel += 2;
+          return "Te acercas al espejo... tu reflejo parpadea antes que tú. (Temor: " + fearLevel + ")";
         }
-
-        function addMessage(text, sender) {
-            const messages = document.getElementById("messages");
-            const messageDiv = document.createElement("div");
-            messageDiv.classList.add("message", sender);
-            messageDiv.textContent = text;
-            messages.appendChild(messageDiv);
-            messages.scrollTop = messages.scrollHeight;
+        if (checkCommand(userMessage, commands.pickUpFlashlight)) {
+          inventory.flashlight = true;
+          return "Recoges una linterna vieja. Su luz es tenue, pero parece útil.";
         }
-    </script>
+        if (checkCommand(userMessage, commands.light)) {
+          inventory.flashlight = true;
+          return "Encuentras una linterna. Ahora puedes iluminar los pasillos oscuros.";
+        }
+        if (checkCommand(userMessage, commands.back)) {
+          gameState = 2;
+          return "Te alejas del espejo y entras en un pasillo oscuro... el aire es denso.";
+        }
+      }
 
+      if (gameState === 2) {
+        if (checkCommand(userMessage, commands.door)) {
+          gameState = 3;
+          return "Encuentras una puerta cerrada. Hay algo al otro lado...";
+        }
+        return "El pasillo parece interminable... Escuchas pasos detrás de ti.";
+      }
+
+      if (gameState === 3) {
+        if (/forzar|golpear|abrir con fuerza/i.test(userMessage)) {
+          if (Math.random() < 0.5) {
+            gameState = 4;
+            return "Con un crujido siniestro, la puerta cede. Al otro lado hay un túnel...";
+          } else {
+            fearLevel += 3;
+            return "Empujas la puerta con fuerza, pero algo la bloquea desde dentro.";
+          }
+        }
+      }
+
+      return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
+    }
+
+    /* ================================
+       Funciones de Apoyo
+    ================================ */
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", sender);
+      messageDiv.textContent = text;
+      messagesEl.appendChild(messageDiv);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function checkCommand(userMessage, commandList) {
+      return commandList.some(command => userMessage.toLowerCase().includes(command));
+    }
+
+    function triggerEnd(text) {
+      document.body.innerHTML = `<h1>${text}</h1>`;
+      setTimeout(() => location.reload(), 5000);
+    }
+  </script>
 </body>
 </html>
