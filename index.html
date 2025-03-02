@@ -5,33 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>⚠️ ERROR 666</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&display=swap');
 
     body {
       margin: 0;
       padding: 0;
-      background: #000;
-      color: #00ff00;
-      font-family: 'Press Start 2P', cursive;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      font-family: 'Space Grotesk', sans-serif;
       text-align: center;
+      transition: background 0.8s ease-in-out;
       overflow: hidden;
     }
 
     h1 {
-      font-size: 2rem;
-      text-shadow: 0 0 10px #00ff00, 0 0 15px #8800ff;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px red, 0 0 15px blue;
       margin-top: 20px;
-      animation: glitch 3s infinite;
+      animation: shadowMove 3s infinite alternate, glitch 3s infinite;
     }
 
     .chat-container {
       max-width: 500px;
       margin: 20px auto;
       padding: 20px;
-      background-color: rgba(0, 0, 0, 0.9);
+      background-color: rgba(20, 20, 20, 0.9);
       border-radius: 12px;
-      box-shadow: 0 0 15px #8800ff;
-      border: 3px solid #00ff00;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
       position: relative;
     }
 
@@ -40,7 +42,7 @@
       overflow-y: auto;
       padding-bottom: 10px;
       margin-bottom: 10px;
-      border-bottom: 1px solid #00ff00;
+      border-bottom: 1px solid rgba(255, 0, 0, 0.3);
       text-align: left;
     }
 
@@ -48,33 +50,40 @@
       padding: 12px;
       border-radius: 8px;
       margin: 5px;
-      font-size: 0.9rem;
+      font-size: 1rem;
       max-width: 80%;
       word-wrap: break-word;
-      font-family: 'Press Start 2P', cursive;
+      backdrop-filter: blur(2px);
     }
 
     .user {
-      background-color: rgba(0, 255, 0, 0.2);
+      background-color: rgba(0, 123, 255, 0.2);
       text-align: right;
-      color: #00ff00;
+      color: #a9c5ff;
       margin-left: auto;
-      border-left: 3px solid #00ff00;
+      border-left: 3px solid #007bff;
     }
 
     .bot {
-      background-color: rgba(136, 0, 255, 0.2);
+      background-color: rgba(220, 53, 69, 0.2);
       text-align: left;
-      color: #8800ff;
+      color: #ff9b9b;
       margin-right: auto;
-      border-right: 3px solid #8800ff;
+      border-right: 3px solid #dc3545;
       animation: flicker 3s infinite alternate;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
     }
 
     @keyframes glitch {
       0% { transform: translate(0, 0); }
       20% { transform: translate(-2px, 2px); }
       40% { transform: translate(2px, -2px); }
+      60% { transform: translate(-2px, 2px); }
+      80% { transform: translate(2px, -2px); }
       100% { transform: translate(0, 0); }
     }
   </style>
@@ -84,29 +93,31 @@
 
   <main class="chat-container">
     <div class="messages" id="messages"></div>
-    <div class="inputs">
-      <input type="text" id="userInput" placeholder="Escribe aquí..." autocomplete="off" style="background: #000; color: #00ff00; border: 2px solid #00ff00; font-family: 'Press Start 2P', cursive; padding: 5px;" />
-      <button id="sendButton" style="background: #8800ff; color: #00ff00; border: 2px solid #00ff00; font-family: 'Press Start 2P', cursive;">Enviar</button>
-    </div>
-  </main>
 
-  <audio id="horrorSound" src="https://www.myinstants.com/media/sounds/creepy.mp3" preload="auto"></audio>
-  <audio id="errorSound" src="https://www.myinstants.com/media/sounds/error.mp3" preload="auto"></audio>
+    <div class="inputs">
+      <input type="text" id="userInput" placeholder="Escribe aquí..." autocomplete="off" />
+      <button id="sendButton">Enviar</button>
+    </div>
+
+    <div class="footer">Un susurro detrás de ti...</div>
+  </main>
 
   <script>
     const messagesEl = document.getElementById("messages");
     const userInputEl = document.getElementById("userInput");
     const sendButtonEl = document.getElementById("sendButton");
     const titleEl = document.getElementById("title");
-    const horrorSound = document.getElementById("horrorSound");
-    const errorSound = document.getElementById("errorSound");
+
+    let glitchCounter = 0;
 
     function sendMessage() {
       const messageText = userInputEl.value.trim();
       if (messageText === "") return;
+
       addMessage(messageText, "user");
+
       userInputEl.value = "";
-      
+
       setTimeout(() => {
         const botResponse = generateResponse(messageText);
         addMessage(botResponse, "bot");
@@ -114,34 +125,31 @@
     }
 
     function generateResponse(userMessage) {
-      if (userMessage.includes("666")) {
+      if (userMessage.toLowerCase().includes("666")) {
         triggerError666();
         return "NO DEBISTE ESCRIBIR ESO.";
-      }
-      
-      if (Math.random() < 0.2) {
-        return `¿${userMessage}? No, eso no lo escribiste tú.`;
       }
 
       const horrorMessages = [
         "Las sombras se están acercando...",
-        "Tu reflejo se ha movido...",
-        "Escucho tu respiración detrás de ti...",
+        "¿Por qué sigues aquí?",
+        "Algo en tu reflejo no coincide...",
         "Los susurros han aumentado...",
-        "No puedes salir ahora.",
-        "Una voz en la estática dice tu nombre..."
+        "Escucho tu respiración...",
+        "¿Qué has despertado?",
+        "No puedes salir ahora."
       ];
-      horrorSound.play();
+
       return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
     }
 
     function triggerError666() {
-      document.body.style.background = "purple";
+      document.body.style.background = "red";
       titleEl.innerText = "⚠ ERROR 666 ⚠";
-      errorSound.play();
       setInterval(() => {
-        document.body.style.background = document.body.style.background === "black" ? "purple" : "black";
+        document.body.style.background = document.body.style.background === "black" ? "red" : "black";
       }, 500);
+
       setTimeout(() => {
         location.reload();
       }, 5000);
@@ -153,6 +161,13 @@
       messageDiv.textContent = text;
       messagesEl.appendChild(messageDiv);
       messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      if (sender === "bot") {
+        setTimeout(() => {
+          messageDiv.style.opacity = 0;
+          setTimeout(() => messageDiv.remove(), 1000);
+        }, Math.random() * 5000 + 3000);
+      }
     }
 
     sendButtonEl.addEventListener("click", sendMessage);
