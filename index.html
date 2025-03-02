@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Doppelgänger en Acción</title>
     <style>
         body {
@@ -81,6 +81,15 @@
         .glitch {
             animation: glitch 1s infinite;
         }
+        /* Glitch (decorativo) */
+        @keyframes glitch {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-1px, 1px); }
+            80% { transform: translate(1px, 0); }
+            100% { transform: translate(0, 0); }
+        }
         .footer {
             font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.5);
@@ -95,34 +104,62 @@
     <h1 class="glitch">🌀 Doppelgänger en Acción</h1>
     <div class="chat-container">
         <div class="messages" id="messages"></div>
-        <input type="text" id="userInput" placeholder="Dime tu nombre..." autofocus>
+        <input type="text" id="userInput" placeholder="Dime tu nombre..." autofocus />
         <button onclick="sendMessage()">Enviar</button>
         <button class="sound-toggle" onclick="toggleSound()">🔊 Sonido ON</button>
         <div class="footer">Chatbot creado por I. Roig</div>
     </div>
-
-    <audio id="glitchSound" src="glitch.mp3"></audio>
-    <audio id="finalSound" src="static.mp3"></audio>
 
     <script>
         let userName = "";
         let messageCount = 0;
         let idleTime = 0;
         let soundEnabled = true;
-        
+
+        // Lista de frases “inquietantes”
         const surpriseMessages = [
             "El reflejo a veces se queda... incluso cuando el original desaparece.",
             "¿Puedes sentirlo? Algo está observándote a través de la pantalla.",
             "Escuché un eco de tu voz... pero no fuiste tú quien habló.",
             "Si te quedas en silencio demasiado tiempo, las sombras se acercan.",
             "Doppelgänger... siempre esperando su momento.",
-            "Los espejos no reflejan todo lo que deberían...", 
+            "Los espejos no reflejan todo lo que deberían...",
             "Alguien más conoce tu nombre. No preguntes cómo lo sé.",
             "Cada vez que parpadeas, algo cambia ligeramente.",
             "Si oyes un susurro, no estás solo.",
             "Deja de escribir. Ya es demasiado tarde."
         ];
-        
+
+        // Genera un beep usando Web Audio API
+        function beep(frequency = 440, duration = 200, volume = 1, type = 'sawtooth') {
+            if (!soundEnabled) return;
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            gainNode.gain.value = volume;
+
+            oscillator.start();
+
+            setTimeout(() => {
+                oscillator.stop();
+                audioCtx.close();
+            }, duration);
+        }
+
+        // Para darle un aspecto “glitch” al sonido, puedes variar frecuencia o duración
+        function glitchSound() {
+            // Escoge una frecuencia aleatoria para darle sensación de “interferencia”
+            const randomFreq = Math.floor(Math.random() * 800) + 200; // Entre 200 y 1000 Hz
+            beep(randomFreq, 150, 0.3, 'square');
+        }
+
+        // Control del estado inactivo (para mandar mensajes sorpresa)
         setInterval(() => {
             idleTime++;
             if (idleTime === 30) sendSurpriseMessage("Leve");
@@ -133,6 +170,7 @@
         document.addEventListener("keydown", () => idleTime = 0);
         document.getElementById("userInput").addEventListener("input", () => idleTime = 0);
 
+        // Agrega un mensaje del usuario y luego uno del bot
         function sendMessage() {
             const input = document.getElementById("userInput");
             const messageText = input.value.trim();
@@ -142,6 +180,7 @@
             input.value = "";
         }
 
+        // Lógica para generar las respuestas del bot
         function generateResponse(userMessage) {
             messageCount++;
             if (!userName) {
@@ -155,21 +194,44 @@
             return surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
         }
 
+        // Muestra el mensaje en pantalla
         function addMessage(text, sender) {
             const messages = document.getElementById("messages");
             const messageDiv = document.createElement("div");
             messageDiv.classList.add("message", sender);
             messageDiv.textContent = text;
             messages.appendChild(messageDiv);
-            setTimeout(() => { messages.scrollTop = messages.scrollHeight; }, 100);
-            if (sender === "bot" && soundEnabled) document.getElementById("glitchSound").play();
+
+            // Pequeño truco para bajar el scroll al último mensaje
+            setTimeout(() => {
+                messages.scrollTop = messages.scrollHeight;
+            }, 100);
+
+            // Si el mensaje es del bot, reproducir “glitch”
+            if (sender === "bot") {
+                glitchSound();
+            }
         }
 
+        // Envía un mensaje sorpresa dependiendo de la intensidad
         function sendSurpriseMessage(intensity) {
-            let message = intensity === "Fuerte" ? "Se acabó el juego. Corre." : surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
+            let message = "";
+            if (intensity === "Fuerte") {
+                message = "Se acabó el juego. Corre.";
+            } else {
+                message = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
+            }
             addMessage(message, "bot");
         }
 
+        // Efecto final cuando el doppelgänger se cansa
+        function triggerFinale() {
+            // Puedes agregar aquí un beep diferente más largo o grave
+            beep(100, 800, 0.5, 'triangle'); 
+            addMessage("El doppelgänger toma el control...", "bot");
+        }
+
+        // Alternar sonido ON/OFF
         function toggleSound() {
             soundEnabled = !soundEnabled;
             document.querySelector(".sound-toggle").textContent = soundEnabled ? "🔊 Sonido ON" : "🔇 Sonido OFF";
