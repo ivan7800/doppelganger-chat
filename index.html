@@ -23,7 +23,7 @@
       letter-spacing: 2px;
       text-shadow: 0 0 10px red, 0 0 15px blue;
       margin-top: 20px;
-      opacity: 0.9;
+      animation: shadowMove 3s infinite alternate, glitch 3s infinite;
     }
 
     .chat-container {
@@ -69,6 +69,7 @@
       color: #ff9b9b;
       margin-right: auto;
       border-right: 3px solid #dc3545;
+      animation: flicker 3s infinite alternate;
     }
 
     .inputs {
@@ -133,6 +134,28 @@
       margin-top: 10px;
       opacity: 0.8;
     }
+
+    /* 🔥 Sombras en movimiento */
+    @keyframes shadowMove {
+      0% { text-shadow: 0 0 10px red, 0 0 15px blue; }
+      100% { text-shadow: 2px 2px 15px cyan, -2px -2px 15px magenta; }
+    }
+
+    /* 👻 Parpadeo del texto del bot */
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* 📺 Pequeño efecto glitch */
+    @keyframes glitch {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(2px, -2px); }
+      60% { transform: translate(-2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+      100% { transform: translate(0, 0); }
+    }
   </style>
 </head>
 <body>
@@ -161,15 +184,27 @@
     const userInputEl = document.getElementById("userInput");
     const sendButtonEl = document.getElementById("sendButton");
 
+    function playSound(frequency) {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = "square";
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.connect(audioContext.destination);
+      oscillator.start();
+      setTimeout(() => oscillator.stop(), 100);
+    }
+
     function sendMessage() {
       const messageText = userInputEl.value.trim();
       if (messageText === "") return;
 
       addMessage(messageText, "user");
+      playSound(800); // Sonido al escribir
       userInputEl.value = "";
 
       setTimeout(() => {
         addMessage(generateResponse(), "bot");
+        playSound(500); // Sonido respuesta del bot
       }, 600);
     }
 
@@ -177,8 +212,8 @@
       const horrorMessages = [
         "Las sombras se mueven sin tu permiso...",
         "Un eco distante repite tu nombre...",
-        "Sientes un escalofrío recorriendo tu espalda...",
-        "Hay un reflejo que parpadea sin que tú lo hagas..."
+        "Tu reflejo en el monitor parpadea antes que tú...",
+        "Hay un error en la realidad... o en ti..."
       ];
       return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
     }
