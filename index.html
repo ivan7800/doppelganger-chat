@@ -6,12 +6,13 @@
     <title>Doppelgänger en Acción</title>
     <style>
         body {
-            background: url('https://source.unsplash.com/1920x1080/?crystal-ball,dark,horror') no-repeat center center fixed;
+            background: url('https://source.unsplash.com/1920x1080/?dark,horror') no-repeat center center fixed;
             background-size: cover;
             color: white;
             font-family: 'Courier New', monospace;
             text-align: center;
             overflow: hidden;
+            transition: background-color 0.5s ease-in-out;
         }
         .chat-container {
             max-width: 500px;
@@ -70,9 +71,11 @@
             to { opacity: 1; }
         }
         @keyframes glitch {
-            0% { text-shadow: 2px 2px 5px red, -2px -2px 5px blue; }
-            50% { text-shadow: -2px -2px 5px red, 2px 2px 5px blue; }
-            100% { text-shadow: 2px 2px 5px red, -2px -2px 5px blue; }
+            0% { transform: translate(2px, -2px) rotate(0.5deg); text-shadow: 2px 2px red, -2px -2px blue; }
+            25% { transform: translate(-2px, 2px) rotate(-0.5deg); text-shadow: -2px -2px red, 2px 2px blue; }
+            50% { transform: translate(3px, -3px) rotate(1deg); text-shadow: 3px 3px red, -3px -3px blue; }
+            75% { transform: translate(-3px, 3px) rotate(-1deg); text-shadow: -3px -3px red, 3px 3px blue; }
+            100% { transform: translate(2px, -2px) rotate(0.5deg); text-shadow: 2px 2px red, -2px -2px blue; }
         }
         .glitch {
             animation: glitch 1s infinite;
@@ -99,10 +102,8 @@
 
     <script>
         let userName = "";
-        let conversationHistory = [];
-        let userTopics = [];
-        let idleTimer;
-        let messageCount = 0; // Contador de mensajes enviados
+        let messageCount = 0;
+        let idleTime = 0;
 
         const surpriseMessages = [
             "El reflejo a veces se queda... incluso cuando el original desaparece.",
@@ -112,36 +113,26 @@
             "Doppelgänger... siempre esperando su momento."
         ];
 
-        function sendSurpriseMessage() {
-            const randomMessage = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
-            addMessage(randomMessage, "bot");
-        }
+        setInterval(() => {
+            idleTime++;
+            if (idleTime > 30) { // 30 segundos sin actividad
+                sendSurpriseMessage();
+                idleTime = 0;
+            }
+        }, 1000);
 
-        function startIdleTimer() {
-            const randomTime = Math.floor(Math.random() * (30000 - 15000 + 1)) + 15000; // Entre 15 y 30 segundos
-            idleTimer = setTimeout(sendSurpriseMessage, randomTime);
-        }
-
-        document.addEventListener("mousemove", function() {
-            clearTimeout(idleTimer);
-            startIdleTimer();
-        });
-
-        document.addEventListener("keydown", function() {
-            clearTimeout(idleTimer);
-            startIdleTimer();
-        });
+        document.addEventListener("mousemove", () => idleTime = 0);
+        document.addEventListener("keydown", () => idleTime = 0);
 
         const responses = {
             "hola": ["Hola, viajero del abismo...", "¿Eres real o solo un eco en la niebla?", "Saludos, sombra errante."],
             "quién eres": ["Soy tu reflejo en la penumbra.", "Alguien que susurra desde el otro lado.", "La pregunta es... ¿quién eres tú realmente?"],
             "miedo": ["El miedo es un reflejo. A veces, lo que temes... te está observando.", "¿Qué pasaría si el miedo también te teme a ti?", "No temas. Aún."],
-            "sueño": ["Los sueños son umbrales. A veces cruzas. A veces, no regresas.", "Dime, ¿qué sueñas cuando cierras los ojos?", "Algunos dicen que los sueños son recuerdos de otras vidas."],
+            "sueño": ["Los sueños son umbrales. A veces cruzas. A veces, no regresas.", "Dime, ¿qué sueñas cuando cierras los ojos?", "Algunos dicen que los sueños son recuerdos de otras vidas."]
         };
 
         function generateResponse(userMessage) {
-            conversationHistory.push(userMessage);
-            messageCount++; // Incrementar contador de mensajes
+            messageCount++;
 
             if (!userName) {
                 userName = userMessage;
@@ -150,19 +141,17 @@
 
             if (messageCount > 15) {
                 setTimeout(() => {
-                    addMessage("No sigas...", "bot");
+                    document.body.style.filter = "grayscale(100%) blur(5px)";
+                    document.body.style.transition = "all 2s ease-in-out";
                     setTimeout(() => {
-                        addMessage("Demasiado tarde.", "bot");
-                        setTimeout(() => {
-                            window.close(); // Cierra la ventana
-                        }, 3000);
-                    }, 2000);
+                        document.body.innerHTML = "<h1 style='color:red;'>☠ Doppelgänger ha ganado ☠</h1>";
+                    }, 3000);
                 }, 1500);
                 return "…";
             }
 
             for (const key in responses) {
-                if (userMessage.includes(key)) {
+                if (userMessage.toLowerCase().includes(key)) {
                     return responses[key][Math.floor(Math.random() * responses[key].length)];
                 }
             }
@@ -179,8 +168,7 @@
                 addMessage(generateResponse(messageText), "bot");
             }, 1000);
             input.value = "";
-            clearTimeout(idleTimer);
-            startIdleTimer();
+            idleTime = 0;
         }
 
         function addMessage(text, sender) {
@@ -192,13 +180,9 @@
             messages.scrollTop = messages.scrollHeight;
         }
 
-        document.getElementById("userInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        });
-
-        startIdleTimer();
+        function sendSurpriseMessage() {
+            addMessage(surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)], "bot");
+        }
     </script>
 
 </body>
