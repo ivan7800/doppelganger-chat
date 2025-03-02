@@ -102,13 +102,14 @@
         let conversationHistory = [];
         let userTopics = [];
         let idleTimer;
+        let messageCount = 0; // Contador de mensajes enviados
 
         const surpriseMessages = [
             "El reflejo a veces se queda... incluso cuando el original desaparece.",
             "¿Puedes sentirlo? Algo está observándote a través de la pantalla.",
             "Escuché un eco de tu voz... pero no fuiste tú quien habló.",
             "Si te quedas en silencio demasiado tiempo, las sombras se acercan.",
-            "Doppelgänger... siempre esperando su momento." 
+            "Doppelgänger... siempre esperando su momento."
         ];
 
         function sendSurpriseMessage() {
@@ -140,15 +141,32 @@
 
         function generateResponse(userMessage) {
             conversationHistory.push(userMessage);
+            messageCount++; // Incrementar contador de mensajes
+
             if (!userName) {
                 userName = userMessage;
                 return `Bienvenido, ${userName}. ¿O acaso ya habías estado aquí antes?`;
             }
+
+            if (messageCount > 15) {
+                setTimeout(() => {
+                    addMessage("No sigas...", "bot");
+                    setTimeout(() => {
+                        addMessage("Demasiado tarde.", "bot");
+                        setTimeout(() => {
+                            window.close(); // Cierra la ventana
+                        }, 3000);
+                    }, 2000);
+                }, 1500);
+                return "…";
+            }
+
             for (const key in responses) {
                 if (userMessage.includes(key)) {
                     return responses[key][Math.floor(Math.random() * responses[key].length)];
                 }
             }
+
             return "Las sombras responden en susurros. A veces, no son lo que esperas.";
         }
 
