@@ -25,69 +25,130 @@
             border-bottom: 1px solid #444;
             padding-bottom: 10px;
             margin-bottom: 10px;
+            text-align: left;
         }
         .message {
-            padding: 5px;
+            padding: 8px;
             border-radius: 5px;
             margin: 5px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in-out;
         }
         .user {
             background-color: #007bff;
             text-align: right;
             color: white;
+            margin-left: auto;
         }
         .bot {
             background-color: #dc3545;
             text-align: left;
             color: white;
+            margin-right: auto;
         }
         input {
             width: 70%;
-            padding: 8px;
+            padding: 10px;
             border-radius: 5px;
-            border: none;
+            border: 1px solid #555;
+            background-color: #333;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+        input:focus {
+            border-color: #007bff;
+            background-color: #444;
         }
         button {
-            padding: 8px;
+            padding: 10px 15px;
             border-radius: 5px;
             background-color: #28a745;
             color: white;
             border: none;
             cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-
     <h1>🌀 Doppelgänger en Acción</h1>
     <div class="chat-container">
         <div class="messages" id="messages"></div>
-        <input type="text" id="userInput" placeholder="Habla con tu sombra...">
-        <button onclick="sendMessage()">Enviar</button>
+        <input type="text" id="userInput" placeholder="Habla con tu sombra..." onkeypress="handleKeyPress(event)" disabled>
+        <button onclick="sendMessage()" disabled>Enviar</button>
     </div>
 
     <script>
-        const responses = [
-            "¿Salvarlo de qué… o de quién?", 
-            "¿Y si el problema real es que el mundo no quiere ser salvado?", 
-            "Tal vez este héroe sea su propio villano sin darse cuenta.",
-            "¿Cada acto heroico lo acerca a la destrucción?", 
-            "¿O acaso es solo un egoísta disfrazado de salvador?"
-        ];
+        let memory = [];
+        const maxMessages = 50;
+        
+        const responses = {
+            "hola": ["Hola, viajero del abismo...", "¿Eres real o solo un eco en la niebla?", "Saludos, sombra errante."],
+            "quién eres": ["Soy tu reflejo en la penumbra.", "Alguien que susurra desde el otro lado."],
+            "default": ["No estoy seguro de entender... pero eso me inquieta.", "Habla más. Tal vez encuentre el patrón en tus palabras."]
+        };
+
+        function scrollToBottom() {
+            const messages = document.getElementById("messages");
+            messages.scrollTop = messages.scrollHeight;
+        }
 
         function sendMessage() {
             const input = document.getElementById("userInput");
+            const button = document.querySelector("button");
             const messageText = input.value.trim();
+
             if (messageText === "") return;
 
             addMessage(messageText, "user");
+            input.value = "";
+            input.disabled = true;
+            button.disabled = true;
+
+            const messages = document.getElementById("messages");
+            const typingDiv = document.createElement("div");
+            typingDiv.classList.add("message", "bot");
+            typingDiv.textContent = "Escribiendo...";
+            messages.appendChild(typingDiv);
+            scrollToBottom();
 
             setTimeout(() => {
-                const botMessage = responses[Math.floor(Math.random() * responses.length)];
+                messages.removeChild(typingDiv);
+                const botMessage = generateResponse(messageText);
                 addMessage(botMessage, "bot");
+                input.disabled = false;
+                button.disabled = false;
+                input.focus();
             }, 1000);
+        }
 
-            input.value = "";
+        function generateResponse(userMessage) {
+            userMessage = userMessage.toLowerCase();
+            memory.push({ sender: "user", message: userMessage });
+            if (memory.length > 5) memory.shift();
+
+            for (const key in responses) {
+                if (userMessage.includes(key)) {
+                    return responses[key][Math.floor(Math.random() * responses[key].length)];
+                }
+            }
+
+            if (memory.length >= 2 && memory[memory.length - 1].message === memory[memory.length - 2].message) {
+                return "Parece que repites tus pensamientos... ¿Hay algo que intentas recordar?";
+            }
+
+            return responses["default"][Math.floor(Math.random() * responses["default"].length)];
         }
 
         function addMessage(text, sender) {
@@ -96,9 +157,24 @@
             messageDiv.classList.add("message", sender);
             messageDiv.textContent = text;
             messages.appendChild(messageDiv);
-            messages.scrollTop = messages.scrollHeight;
-        }
-    </script>
 
+            if (messages.children.length > maxMessages) {
+                messages.removeChild(messages.firstChild);
+            }
+
+            scrollToBottom();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
+        window.onload = function() {
+            document.getElementById("userInput").disabled = false;
+            document.querySelector("button").disabled = false;
+        };
+    </script>
 </body>
 </html>
