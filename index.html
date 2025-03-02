@@ -3,26 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌀 Tu Doppelgänger en Acción</title>
+    <title>Doppelgänger en Acción</title>
     <style>
         body {
-            background-color: #111;
+            background: url('https://source.unsplash.com/1920x1080/?crystal-ball,dark,horror') no-repeat center center fixed;
+            background-size: cover;
             color: white;
-            font-family: 'Georgia', serif;
+            font-family: Arial, sans-serif;
             text-align: center;
-            overflow: hidden;
         }
         .chat-container {
             max-width: 500px;
             margin: 20px auto;
             padding: 20px;
-            background-color: #222;
+            background-color: rgba(34, 34, 34, 0.85);
             border-radius: 10px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-            opacity: 1;
-            transition: opacity 1s ease-in-out;
-            max-height: 80vh;
-            overflow-y: auto;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
         .messages {
             height: 300px;
@@ -30,108 +26,122 @@
             border-bottom: 1px solid #444;
             padding-bottom: 10px;
             margin-bottom: 10px;
-            text-align: left;
-            font-size: 1.1rem;
         }
         .message {
-            padding: 10px;
-            border-radius: 8px;
-            margin: 6px;
-            max-width: 80%;
-            word-wrap: break-word;
-            animation: fadeIn 0.3s ease-in-out;
+            padding: 5px;
+            border-radius: 5px;
+            margin: 5px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
         }
         .user {
             background-color: #007bff;
             text-align: right;
             color: white;
-            margin-left: auto;
         }
         .bot {
             background-color: #dc3545;
             text-align: left;
             color: white;
-            margin-right: auto;
         }
         input {
             width: 70%;
-            padding: 12px;
+            padding: 8px;
             border-radius: 5px;
-            border: 1px solid #555;
-            background-color: #333;
-            color: white;
-            outline: none;
-            transition: all 0.3s;
-            font-size: 1rem;
+            border: none;
         }
         button {
-            padding: 12px 18px;
+            padding: 8px;
             border-radius: 5px;
             background-color: #28a745;
             color: white;
             border: none;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.3s, transform 0.2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="chat-container" id="chat-container">
-        <h2 id="saludo">Tu sombra te espera...</h2>
+
+    <h1>🌀 Doppelgänger en Acción</h1>
+    <div class="chat-container">
         <div class="messages" id="messages"></div>
-        <input type="text" id="userInput" placeholder="Habla con tu Doppelgänger..." onkeydown="if(event.key === 'Enter') sendMessage()">
+        <input type="text" id="userInput" placeholder="Dime tu nombre..." autofocus>
         <button onclick="sendMessage()">Enviar</button>
     </div>
 
     <script>
-        function sendMessage() {
-            let input = document.getElementById("userInput");
-            let message = input.value.trim();
-            if (!message) return;
+        let userName = "";
+        const responses = {
+            "hola": ["Hola, viajero del abismo...", "¿Eres real o solo un eco en la niebla?", "Saludos, sombra errante."],
+            "quién eres": ["Soy tu reflejo en la penumbra.", "Alguien que susurra desde el otro lado.", "La pregunta es... ¿quién eres tú realmente?"],
+            "qué haces": ["Espero, como siempre. Observando.", "Escucho... Y a veces respondo.", "Me oculto en los reflejos y espero a que hables."],
+            "miedo": ["El miedo es un reflejo. A veces, lo que temes... te está observando.", "¿Qué pasaría si el miedo también te teme a ti?", "No temas. Aún."],
+            "sueño": ["Los sueños son umbrales. A veces cruzas. A veces, no regresas.", "Dime, ¿qué sueñas cuando cierras los ojos?", "Algunos dicen que los sueños son recuerdos de otras vidas."],
+            "realidad": ["La realidad es una ilusión compartida.", "¿Y si estamos atrapados en un sueño de alguien más?", "La verdad es un espejismo. ¿O acaso crees en lo que ves?"],
+            "random": ["El destino es solo una serie de coincidencias. O no.", "El azar es una excusa para lo que no entendemos.", "El caos también sigue un patrón. Solo hay que verlo."]
+        };
 
-            let chatBox = document.getElementById("messages");
-            chatBox.innerHTML += `<div class="message user">${message}</div>`;
+        const genericResponses = [
+            "No estoy seguro de entender... pero eso me inquieta.",
+            "Habla más. Tal vez encuentre el patrón en tus palabras.",
+            "Las sombras responden en susurros. A veces, no son lo que esperas."
+        ];
 
-            let botResponse = generarRespuesta(message);
-            chatBox.innerHTML += `<div class="message bot">${botResponse}</div>`;
+        const sound = new Audio("https://freesound.org/data/previews/574/574207_12125473-lq.mp3");
 
-            input.value = "";
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function generarRespuesta(input) {
-            input = input.toLowerCase();
-
-            const respuestasGenerales = [
-                "¿Y si todo lo que crees es una mentira conveniente?",
-                "¿Te atreverías a ver la versión más oscura de ti mismo?",
-                "Si realmente supieras la verdad, ¿seguirías adelante o te detendrías?",
-                "¿Qué pasaría si tu mejor idea fuera en realidad tu peor error?",
-                "No soy tu enemigo, pero tampoco soy tu amigo. ¿Te atreves a escucharme?",
-                "Cada decisión que tomas tiene un precio oculto. ¿Estás dispuesto a pagarlo?"
-            ];
-
-            const respuestasPorPalabrasClave = {
-                "hola": ["¿Seguro que eres tú quien me habla... o soy yo quien habla contigo?", "Un simple saludo... pero ¿es realmente tan simple?"],
-                "nombre": ["Los nombres son máscaras. ¿Cuál es la tuya realmente?", "¿Acaso importa cómo te llamas si no eres quien crees ser?"],
-                "quién eres": ["Soy el eco de lo que ignoras. ¿Quieres escucharme o seguir huyendo?", "Soy lo que serías si abandonaras tus miedos."],
-                "dónde estás": ["Justo detrás de tus pensamientos más oscuros.", "Siempre a tu lado, esperando que abras los ojos."],
-                "ayuda": ["¿Quieres ayuda… o solo confirmación de lo que ya sabes?", "No puedes escapar de ti mismo. ¿Por qué intentarlo?"],
-                "miedo": ["El miedo solo es real si le das poder. ¿Y si lo desafiaras?", "Si temes a la oscuridad, es porque aún no te has convertido en ella."],
-                "decisión": ["Cada decisión que tomas cierra una puerta. ¿Sabes cuál dejaste atrás?", "Elegir no es más que renunciar. ¿Estás seguro de haber renunciado a lo correcto?"],
-                "sombra": ["Tu sombra sabe más de ti que tú mismo. ¿Te atreves a preguntarle?", "No puedes deshacerte de mí. Soy parte de ti."]
-            };
-
-            for (let palabra in respuestasPorPalabrasClave) {
-                if (input.includes(palabra)) {
-                    return respuestasPorPalabrasClave[palabra][Math.floor(Math.random() * respuestasPorPalabrasClave[palabra].length)];
+        function generateResponse(userMessage) {
+            if (!userName) {
+                userName = userMessage;
+                return `Bienvenido, ${userName}. ¿O acaso ya habías estado aquí antes?`;
+            }
+            userMessage = userMessage.toLowerCase();
+            for (const key in responses) {
+                if (userMessage.includes(key)) {
+                    let reply = responses[key][Math.floor(Math.random() * responses[key].length)];
+                    if (Math.random() < 0.3) {
+                        reply += ` ${genericResponses[Math.floor(Math.random() * genericResponses.length)]}`;
+                    }
+                    return reply.replace("viajero", userName);
                 }
             }
-
-            return respuestasGenerales[Math.floor(Math.random() * respuestasGenerales.length)];
+            return genericResponses[Math.floor(Math.random() * genericResponses.length)];
         }
+
+        function sendMessage() {
+            const input = document.getElementById("userInput");
+            const messageText = input.value.trim();
+            if (messageText === "") return;
+
+            addMessage(messageText, "user");
+
+            setTimeout(() => {
+                const botMessage = generateResponse(messageText);
+                addMessage(botMessage, "bot");
+                sound.play();
+            }, 1000);
+
+            input.value = "";
+        }
+
+        function addMessage(text, sender) {
+            const messages = document.getElementById("messages");
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", sender);
+            messageDiv.textContent = text;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        document.getElementById("userInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
     </script>
+
 </body>
 </html>
