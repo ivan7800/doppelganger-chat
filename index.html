@@ -12,7 +12,7 @@
             font-family: 'Courier New', monospace;
             text-align: center;
             overflow: hidden;
-            transition: background 1s ease-in-out;
+            transition: background 1s ease-in-out, filter 0.5s;
         }
         .chat-container {
             max-width: 500px;
@@ -40,7 +40,7 @@
         }
         .user { background-color: #007bff; text-align: right; color: white; }
         .bot { background-color: #dc3545; text-align: left; color: white; }
-        .glitch-text { text-shadow: 2px 2px 5px red, -2px -2px 5px blue; }
+        .glitch-text { text-shadow: 2px 2px 5px red, -2px -2px 5px blue; animation: glitch 0.1s infinite alternate; }
         input, button {
             padding: 8px;
             border-radius: 5px;
@@ -49,8 +49,27 @@
             color: white;
             margin-top: 5px;
         }
+        .dark-flash { filter: brightness(0); transition: filter 0.3s; }
+        .presence {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background: url('https://source.unsplash.com/100x100/?shadow,ghost') no-repeat center center;
+            background-size: cover;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .footer { font-size: 0.8rem; color: rgba(255, 255, 255, 0.5); }
+        @keyframes glitch {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+            60% { transform: translate(-1px, 1px); }
+            80% { transform: translate(1px, 0); }
+            100% { transform: translate(0, 0); }
+        }
         @keyframes flicker {
             0% { opacity: 1; }
             50% { opacity: 0.2; }
@@ -66,6 +85,7 @@
         <button onclick="sendMessage()">Enviar</button>
         <div class="footer">Chatbot creado por I. Roig</div>
     </div>
+    <div class="presence" id="presence"></div>
 
     <script>
         let userName = "";
@@ -121,23 +141,14 @@
         }
 
         function triggerFinale() {
-            document.body.style.animation = "flicker 0.1s infinite";
+            document.body.classList.add("dark-flash");
+            document.getElementById("presence").style.opacity = "1";
             document.title = "Error 404 - Doppelgänger Control";
             setTimeout(() => {
                 document.body.innerHTML = '<h1 class="glitch-text">El Doppelgänger ha tomado el control...</h1>';
                 setTimeout(() => { location.reload(); }, 5000);
             }, 2000);
         }
-
-        setInterval(() => {
-            idleTime++;
-            if (idleTime === 20) { document.title = "¿Sigues ahí?"; addMessage("¿Sigues ahí?", "bot"); }
-            if (idleTime === 40) { document.title = "No te muevas..."; addMessage("No te muevas...", "bot"); }
-            if (idleTime === 60) triggerFinale();
-        }, 1000);
-
-        document.addEventListener("mousemove", () => idleTime = 0);
-        document.addEventListener("keydown", () => idleTime = 0);
     </script>
 </body>
 </html>
