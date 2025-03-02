@@ -1,154 +1,329 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Doppelgänger en Acción</title>
-    <style>
-        body {
-            background: url('https://source.unsplash.com/1920x1080/?dark,horror') no-repeat center center fixed;
-            background-size: cover;
-            color: white;
-            font-family: 'Courier New', monospace;
-            text-align: center;
-            overflow: hidden;
-            transition: background 1s ease-in-out, filter 0.5s;
-        }
-        .chat-container {
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.85);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-            position: relative;
-        }
-        .messages {
-            height: 300px;
-            overflow-y: auto;
-            border-bottom: 1px solid #ff0000;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
-        .message {
-            padding: 10px;
-            border-radius: 5px;
-            margin: 5px;
-            font-size: 1rem;
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
-        }
-        .user { background-color: #007bff; text-align: right; color: white; }
-        .bot { background-color: #dc3545; text-align: left; color: white; }
-        .glitch-text { text-shadow: 2px 2px 5px red, -2px -2px 5px blue; animation: glitch 0.1s infinite alternate; }
-        input, button {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid red;
-            background: black;
-            color: white;
-            margin-top: 5px;
-        }
-        .dark-flash { filter: brightness(0); transition: filter 0.3s; }
-        .presence {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 100px;
-            height: 100px;
-            background: url('https://source.unsplash.com/100x100/?shadow,ghost') no-repeat center center;
-            background-size: cover;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes glitch {
-            0% { transform: translate(0, 0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(2px, -2px); }
-            60% { transform: translate(-1px, 1px); }
-            80% { transform: translate(1px, 0); }
-            100% { transform: translate(0, 0); }
-        }
-        @keyframes flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.2; }
-            100% { opacity: 1; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Chat de terror interactivo con efecto de Doppelgänger."/>
+  <title>Doppelgänger en Acción</title>
+  
+  <style>
+    /* ------------------------------
+      Estilos Generales
+    ------------------------------ */
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('https://source.unsplash.com/1920x1080/?dark,horror') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      transition: background 1s ease-in-out, filter 0.5s;
+      overflow: hidden;
+    }
+
+    h1.glitch-text {
+      text-shadow: 2px 2px 5px red, -2px -2px 5px blue;
+      animation: glitch 0.1s infinite alternate;
+      margin-top: 20px;
+    }
+
+    /* ------------------------------
+      Contenedor del Chat
+    ------------------------------ */
+    .chat-container {
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: rgba(0, 0, 0, 0.85);
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .messages {
+      height: 300px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ff0000;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+
+    .message {
+      padding: 10px;
+      border-radius: 5px;
+      margin: 5px;
+      font-size: 1rem;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+      width: fit-content;
+    }
+
+    .user {
+      background-color: #007bff;
+      text-align: right;
+      color: white;
+      margin-left: auto;
+    }
+
+    .bot {
+      background-color: #dc3545;
+      text-align: left;
+      color: white;
+      margin-right: auto;
+    }
+
+    .glitch-text {
+      text-shadow: 2px 2px 5px red, -2px -2px 5px blue;
+      animation: glitch 0.1s infinite alternate;
+    }
+
+    .inputs {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      margin-bottom: 5px;
+    }
+
+    input, button {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid red;
+      background: black;
+      color: white;
+      font-family: inherit;
+    }
+
+    .footer {
+      font-size: 0.8rem;
+      margin-top: 10px;
+      opacity: 0.8;
+    }
+
+    /* ------------------------------
+      Efecto de Pantalla Oscura
+    ------------------------------ */
+    .dark-flash {
+      filter: brightness(0);
+      transition: filter 0.3s;
+    }
+
+    /* ------------------------------
+      Presencia Fantasmal
+    ------------------------------ */
+    .presence {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 100px;
+      height: 100px;
+      background: url('https://source.unsplash.com/100x100/?shadow,ghost') no-repeat center center;
+      background-size: cover;
+      opacity: 0;
+      transition: opacity 0.3s;
+      transform: translate(-50%, -50%);
+    }
+
+    /* ------------------------------
+      Animaciones Clave
+    ------------------------------ */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes glitch {
+      0%   { transform: translate(0, 0); }
+      20%  { transform: translate(-2px, 2px); }
+      40%  { transform: translate(2px, -2px); }
+      60%  { transform: translate(-1px, 1px); }
+      80%  { transform: translate(1px, 0); }
+      100% { transform: translate(0, 0); }
+    }
+    @keyframes flicker {
+      0%   { opacity: 1; }
+      50%  { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    /* ------------------------------
+      Responsividad
+    ------------------------------ */
+    @media (max-width: 550px) {
+      .chat-container {
+        width: 90%;
+        padding: 10px;
+      }
+      .messages {
+        height: 250px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1 class="glitch-text">🌀 Doppelgänger en Acción</h1>
-    <div class="chat-container">
-        <div class="messages" id="messages"></div>
-        <input type="text" id="userInput" placeholder="Dime tu nombre..." autofocus />
-        <button onclick="sendMessage()">Enviar</button>
-        <div class="footer">Chatbot creado por I. Roig</div>
+  <h1 class="glitch-text">🌀 Doppelgänger en Acción</h1>
+
+  <main role="main" class="chat-container">
+    <div class="messages" id="messages" aria-live="polite" aria-atomic="true"></div>
+    <div class="inputs">
+      <input 
+        type="text" 
+        id="userInput" 
+        placeholder="Dime tu nombre..." 
+        autocomplete="off" 
+        aria-label="Introduce tu mensaje" />
+      <button id="sendButton">Enviar</button>
     </div>
-    <div class="presence" id="presence"></div>
+    <div class="footer">Chatbot creado por I. Roig</div>
+  </main>
 
-    <script>
-        let userName = "";
-        let messageCount = 0;
-        let idleTime = 0;
-        const surpriseMessages = [
-            "El reflejo a veces se queda... incluso cuando el original desaparece.",
-            "¿Puedes sentirlo? Algo está observándote a través de la pantalla.",
-            "Escuché un eco de tu voz... pero no fuiste tú quien habló.",
-            "Si te quedas en silencio demasiado tiempo, las sombras se acercan.",
-            "Doppelgänger... siempre esperando su momento.",
-            "Los espejos no reflejan todo lo que deberían...",
-            "Cada vez que parpadeas, algo cambia ligeramente.",
-            "Deja de escribir. Ya es demasiado tarde."
-        ];
+  <div class="presence" id="presence" aria-hidden="true"></div>
 
-        function sendMessage() {
-            const input = document.getElementById("userInput");
-            const messageText = input.value.trim();
-            if (messageText === "") return;
-            addMessage(messageText, "user");
-            setTimeout(() => addMessage(generateResponse(messageText), "bot"), 500 + Math.random() * 1000);
-            input.value = "";
-        }
+  <script>
+    /* -----------------------------------------
+       Variables y Constantes
+    ----------------------------------------- */
+    const messagesEl = document.getElementById("messages");
+    const userInputEl = document.getElementById("userInput");
+    const sendButtonEl = document.getElementById("sendButton");
+    const presenceEl = document.getElementById("presence");
 
-        function generateResponse(userMessage) {
-            messageCount++;
-            if (!userName) {
-                userName = userMessage;
-                return `Bienvenido, ${userName}. ¿O acaso ya habías estado aquí antes?`;
-            }
-            if (messageCount > 15) {
-                triggerFinale();
-                return "…";
-            }
-            let response = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
-            if (Math.random() < 0.3) response = flipText(response);
-            return response;
-        }
+    // Ajusta el número de mensajes antes del "final" a tu gusto.
+    const MAX_MESSAGES = 15;
+    let messageCount = 0;
+    let userName = "";
 
-        function addMessage(text, sender) {
-            const messages = document.getElementById("messages");
-            const messageDiv = document.createElement("div");
-            messageDiv.classList.add("message", sender);
-            if (sender === "bot") messageDiv.classList.add("glitch-text");
-            messageDiv.textContent = text;
-            messages.appendChild(messageDiv);
-            setTimeout(() => { messages.scrollTop = messages.scrollHeight; }, 100);
-        }
+    // Mensajes que mostrará el bot aleatoriamente
+    const surpriseMessages = [
+      "El reflejo a veces se queda... incluso cuando el original desaparece.",
+      "¿Puedes sentirlo? Algo está observándote a través de la pantalla.",
+      "Escuché un eco de tu voz... pero no fuiste tú quien habló.",
+      "Si te quedas en silencio demasiado tiempo, las sombras se acercan.",
+      "Doppelgänger... siempre esperando su momento.",
+      "Los espejos no reflejan todo lo que deberían...",
+      "Cada vez que parpadeas, algo cambia ligeramente.",
+      "Deja de escribir. Ya es demasiado tarde.",
+      "A veces, el reflejo parpadea... pero tú no.",
+      "Hay un susurro detrás de ti que imita tu voz.",
+      "Cuando miras a un espejo, él también te está mirando.",
+      "¿Notaste el frío repentino? No estabas solo.",
+      "Los sueños a veces revelan más que la realidad.",
+      "Cierra los ojos. Verás que la oscuridad no está vacía.",
+      "Los pasos detrás de ti se detienen cuando tú también te detienes.",
+      "El espejo sonríe cuando tú no lo haces.",
+      "La sensación de que te tocan el hombro... aunque estés solo.",
+      "Nadie está a salvo de su propio reflejo.",
+      "Una sombra extra cruza la habitación, pero no es la tuya.",
+      "Cada reflejo cuenta una historia distinta, ¿cuál es la tuya?"
+    ];
 
-        function flipText(text) {
-            return text.split(" ").map(word => Math.random() < 0.5 ? word.split("").reverse().join("") : word).join(" ");
-        }
+    /* -----------------------------------------
+       Eventos
+    ----------------------------------------- */
+    // Enviar al hacer click en el botón
+    sendButtonEl.addEventListener("click", sendMessage);
 
-        function triggerFinale() {
-            document.body.classList.add("dark-flash");
-            document.getElementById("presence").style.opacity = "1";
-            document.title = "Error 404 - Doppelgänger Control";
-            setTimeout(() => {
-                document.body.innerHTML = '<h1 class="glitch-text">El Doppelgänger ha tomado el control...</h1>';
-                setTimeout(() => { location.reload(); }, 5000);
-            }, 2000);
-        }
-    </script>
+    // Enviar al presionar Enter en el input
+    userInputEl.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    });
+
+    /* -----------------------------------------
+       Funciones Principales
+    ----------------------------------------- */
+    function sendMessage() {
+      const messageText = userInputEl.value.trim();
+      if (messageText === "") return;
+
+      // Agrega el mensaje del usuario
+      addMessage(messageText, "user");
+
+      // Limpia el input
+      userInputEl.value = "";
+
+      // Respuesta del bot con un ligero retardo
+      setTimeout(() => {
+        const botResponse = generateResponse(messageText);
+        addMessage(botResponse, "bot");
+      }, 500 + Math.random() * 1000);
+    }
+
+    function generateResponse(userMessage) {
+      // Primer mensaje: el bot guarda el nombre y responde
+      if (!userName) {
+        userName = userMessage;
+        messageCount++;
+        return `Bienvenido, ${userName}. ¿O acaso ya habías estado aquí antes?`;
+      }
+
+      // A partir de cierto número de mensajes, desencadena el final
+      if (messageCount > MAX_MESSAGES) {
+        triggerFinale();
+        return "…";
+      }
+
+      // Muestra un mensaje aleatorio
+      const randomIndex = Math.floor(Math.random() * surpriseMessages.length);
+      let response = surpriseMessages[randomIndex];
+
+      // Con cierta probabilidad, invierte el texto parcial
+      if (Math.random() < 0.3) {
+        response = flipText(response);
+      }
+
+      messageCount++;
+      return response;
+    }
+
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", sender);
+
+      // Agrega clase de glitch si es el bot
+      if (sender === "bot") {
+        messageDiv.classList.add("glitch-text");
+      }
+
+      messageDiv.textContent = text;
+      messagesEl.appendChild(messageDiv);
+      
+      // Forzar scroll al final
+      setTimeout(() => {
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+      }, 100);
+    }
+
+    function flipText(text) {
+      return text
+        .split(" ")
+        .map(word => Math.random() < 0.5 ? word.split("").reverse().join("") : word)
+        .join(" ");
+    }
+
+    /* -----------------------------------------
+       Efecto Final
+    ----------------------------------------- */
+    function triggerFinale() {
+      // Pantalla se oscurece
+      document.body.classList.add("dark-flash");
+
+      // Aparece la presencia fantasmal
+      presenceEl.style.opacity = "1";
+
+      // Cambia el título
+      document.title = "Error 404 - Doppelgänger Control";
+
+      setTimeout(() => {
+        // Reemplaza todo el contenido con mensaje de control
+        document.body.innerHTML = '<h1 class="glitch-text" style="margin-top:20px;">El Doppelgänger ha tomado el control...</h1>';
+        
+        // Recarga después de 5 segundos
+        setTimeout(() => {
+          location.reload();
+        }, 5000);
+      }, 2000);
+    }
+  </script>
 </body>
 </html>
