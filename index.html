@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doppelgänger Mejorado</title>
+  <title>Doppelgänger en Acción</title>
   <style>
     body {
       margin: 0;
@@ -82,7 +82,7 @@
   </style>
 </head>
 <body>
-  <h1 class="glitch-text">Doppelgänger Mejorado</h1>
+  <h1 class="glitch-text">Doppelgänger en Acción</h1>
   <div class="chat-container">
     <div class="messages" id="messages"></div>
     <input type="text" id="userInput" placeholder="Escribe tu mensaje..." autofocus />
@@ -92,16 +92,8 @@
   <script>
     let userName = "";
     let messageCount = 0;
-    let idleTime = 0;
-    const surpriseMessages = [
-      "Las sombras se mueven sin tu permiso.",
-      "Un eco distante repite tu nombre.",
-      "Sientes un escalofrío que recorre tu espalda...",
-      "Hay un reflejo que parpadea sin que tú lo hagas.",
-      "El tiempo se distorsiona en la penumbra.",
-      "Un susurro muy cerca de tu oído... ¿lo escuchaste?"
-    ];
-
+    let possessionLevel = 0;
+    
     function sendMessage() {
       const input = document.getElementById("userInput");
       const messageText = input.value.trim();
@@ -113,11 +105,29 @@
 
     function generateResponse(userMessage) {
       messageCount++;
+      possessionLevel++;
+      
       if (!userName) {
         userName = userMessage;
         return `Bienvenido, ${userName}. ¿O acaso ya habías estado aquí antes?`;
       }
-      return surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
+      
+      if (possessionLevel < 5) {
+        return mimicUser(userMessage);
+      } else if (possessionLevel < 10) {
+        return distortText(mimicUser(userMessage));
+      } else {
+        triggerFinale();
+        return "…";
+      }
+    }
+    
+    function mimicUser(text) {
+      return `Yo también pienso: "${text}"... curioso, ¿verdad?`;
+    }
+    
+    function distortText(text) {
+      return text.split(" ").map(word => Math.random() < 0.5 ? word.split("").reverse().join("") : word).join(" ");
     }
 
     function addMessage(text, sender) {
@@ -128,6 +138,14 @@
       messageDiv.textContent = text;
       messages.appendChild(messageDiv);
       setTimeout(() => { messages.scrollTop = messages.scrollHeight; }, 100);
+    }
+
+    function triggerFinale() {
+      document.body.style.filter = "brightness(0)";
+      setTimeout(() => {
+        document.body.innerHTML = '<h1 class="glitch-text">El Doppelgänger ha tomado el control...</h1>';
+        setTimeout(() => { location.reload(); }, 5000);
+      }, 2000);
     }
   </script>
 </body>
