@@ -3,104 +3,146 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doppelgänger en acción</title>
+  <title>Doppelgänger</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&display=swap');
+
     body {
       margin: 0;
       padding: 0;
-      background: black;
-      color: white;
-      font-family: 'Courier New', monospace;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      font-family: 'Space Grotesk', sans-serif;
       text-align: center;
-      transition: background 1s ease-in-out, filter 0.5s;
+      transition: background 0.8s ease-in-out;
       overflow: hidden;
     }
+
     h1 {
-      text-shadow: 2px 2px 5px red, -2px -2px 5px blue;
-      animation: glitch 0.1s infinite alternate;
+      font-size: 2.5rem;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px red, 0 0 15px blue;
       margin-top: 20px;
+      opacity: 0.9;
     }
+
     .chat-container {
       max-width: 500px;
       margin: 20px auto;
       padding: 20px;
-      background-color: rgba(0, 0, 0, 0.85);
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+      background-color: rgba(20, 20, 20, 0.9);
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+      backdrop-filter: blur(6px);
     }
+
     .messages {
       height: 300px;
       overflow-y: auto;
-      border-bottom: 1px solid red;
       padding-bottom: 10px;
       margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+      text-align: left;
     }
+
     .message {
-      padding: 10px;
-      border-radius: 5px;
+      padding: 12px;
+      border-radius: 8px;
       margin: 5px;
       font-size: 1rem;
-      width: fit-content;
+      max-width: 80%;
+      word-wrap: break-word;
+      backdrop-filter: blur(2px);
     }
+
     .user {
-      background-color: #007bff;
+      background-color: rgba(0, 123, 255, 0.2);
       text-align: right;
-      color: white;
+      color: #a9c5ff;
       margin-left: auto;
+      border-left: 3px solid #007bff;
     }
+
     .bot {
-      background-color: #dc3545;
+      background-color: rgba(220, 53, 69, 0.2);
       text-align: left;
-      color: white;
+      color: #ff9b9b;
       margin-right: auto;
+      border-right: 3px solid #dc3545;
     }
+
     .inputs {
       display: flex;
-      gap: 5px;
+      gap: 8px;
       justify-content: center;
-      margin-bottom: 5px;
+      margin-bottom: 10px;
     }
-    input, button {
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid red;
-      background: black;
+
+    input {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(30, 30, 30, 0.8);
       color: white;
       font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
     }
+
+    input:focus {
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+    }
+
+    button {
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: red;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: darkred;
+      box-shadow: 0 0 12px red;
+    }
+
+    .inventory {
+      text-align: left;
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(20, 20, 20, 0.7);
+      border-radius: 8px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      border-left: 2px solid rgba(255, 0, 0, 0.5);
+    }
+
+    .inventory ul {
+      list-style: none;
+      padding: 0;
+    }
+
     .footer {
       font-size: 0.8rem;
       margin-top: 10px;
       opacity: 0.8;
     }
-    .inventory {
-      text-align: left;
-      margin-top: 10px;
-      padding: 10px;
-      border: 1px solid red;
-      border-radius: 5px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .inventory ul {
-      list-style: none;
-      padding: 0;
-    }
-    .inventory li {
-      padding: 5px;
-      border-bottom: 1px solid red;
-    }
   </style>
 </head>
 <body>
-  <h1>Doppelgänger Mejorado</h1>
+  <h1>Doppelgänger</h1>
 
   <main class="chat-container">
-    <div class="messages" id="messages" aria-live="polite" aria-atomic="true"></div>
+    <div class="messages" id="messages"></div>
 
     <div class="inputs">
-      <input type="text" id="userInput" placeholder="Escribe tu mensaje (Ej: 'mirar espejo')..." autocomplete="off" aria-label="Escribe un mensaje al Doppelgänger" />
+      <input type="text" id="userInput" placeholder="Escribe aquí..." autocomplete="off" />
       <button id="sendButton">Enviar</button>
     </div>
 
@@ -111,43 +153,13 @@
       </ul>
     </div>
 
-    <div class="footer">Chat de horror interactivo</div>
+    <div class="footer">Un susurro detrás de ti...</div>
   </main>
 
   <script>
     const messagesEl = document.getElementById("messages");
     const userInputEl = document.getElementById("userInput");
     const sendButtonEl = document.getElementById("sendButton");
-    const inventoryEl = document.getElementById("inventory");
-
-    let gameState = 0;  
-    let userName = "";
-    let fearLevel = 0;
-    let inventory = { flashlight: false };
-    let messageCount = 0;
-    const MAX_MESSAGES = 20;
-
-    const commands = {
-      mirror: ["mirar espejo", "examinar espejo", "ver espejo"],
-      light: ["encender luz", "buscar interruptor"],
-      back: ["retroceder", "volver"],
-      pickUpFlashlight: ["coger linterna", "tomar linterna"],
-      door: ["abrir puerta", "examinar puerta"],
-    };
-
-    const horrorMessages = [
-      "Las sombras se mueven sin tu permiso.",
-      "Un eco distante repite tu nombre.",
-      "Sientes un escalofrío recorriendo tu espalda...",
-      "Hay un reflejo que parpadea sin que tú lo hagas.",
-    ];
-
-    sendButtonEl.addEventListener("click", sendMessage);
-    userInputEl.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        sendMessage();
-      }
-    });
 
     function sendMessage() {
       const messageText = userInputEl.value.trim();
@@ -157,56 +169,17 @@
       userInputEl.value = "";
 
       setTimeout(() => {
-        const botResponse = generateResponse(messageText);
-        addMessage(botResponse, "bot");
-      }, 500 + Math.random() * 1000);
+        addMessage(generateResponse(), "bot");
+      }, 600);
     }
 
-    function generateResponse(userMessage) {
-      messageCount++;
-
-      if (fearLevel >= 10) {
-        triggerEnd("El Doppelgänger toma tu cuerpo...");
-        return "…";
-      }
-
-      if (messageCount > MAX_MESSAGES) {
-        triggerEnd("El número de susurros es demasiado. El Doppelgänger despierta...");
-        return "…";
-      }
-
-      if (gameState === 0) {
-        userName = userMessage;
-        gameState = 1;
-        return `Bienvenido, ${userName}. Una sombra observa desde el espejo... Es difícil distinguir su rostro. ¿Te acercas al espejo o buscas una luz?`;
-      }
-
-      if (gameState === 1) {
-        if (checkCommand(userMessage, commands.mirror)) {
-          fearLevel += 2;
-          return `Te acercas al espejo... tu reflejo parpadea antes que tú. (Temor: ${fearLevel})`;
-        }
-        if (checkCommand(userMessage, commands.pickUpFlashlight)) {
-          inventory.flashlight = true;
-          updateInventory();
-          return "Recoges una linterna vieja. Su luz es tenue, pero parece útil.";
-        }
-        if (checkCommand(userMessage, commands.light)) {
-          inventory.flashlight = true;
-          updateInventory();
-          return "Encuentras una linterna. Ahora puedes iluminar los pasillos oscuros.";
-        }
-        if (checkCommand(userMessage, commands.back)) {
-          gameState = 2;
-          return "Te alejas del espejo y entras en un pasillo oscuro... el aire es denso.";
-        }
-      }
-
-      if (gameState === 2 && checkCommand(userMessage, commands.door)) {
-        gameState = 3;
-        return "Encuentras una puerta cerrada. Hay algo al otro lado...";
-      }
-
+    function generateResponse() {
+      const horrorMessages = [
+        "Las sombras se mueven sin tu permiso...",
+        "Un eco distante repite tu nombre...",
+        "Sientes un escalofrío recorriendo tu espalda...",
+        "Hay un reflejo que parpadea sin que tú lo hagas..."
+      ];
       return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
     }
 
@@ -218,21 +191,10 @@
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    function checkCommand(userMessage, commandList) {
-      return commandList.some(command => userMessage.toLowerCase().includes(command));
-    }
-
-    function updateInventory() {
-      inventoryEl.innerHTML = Object.entries(inventory)
-        .filter(([item, has]) => has)
-        .map(([item]) => `<li>${item}</li>`)
-        .join("") || "<li>Nada aún...</li>";
-    }
-
-    function triggerEnd(text) {
-      addMessage(text, "bot");
-      setTimeout(() => location.reload(), 5000);
-    }
+    sendButtonEl.addEventListener("click", sendMessage);
+    userInputEl.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") sendMessage();
+    });
   </script>
 </body>
 </html>
