@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doppelgänger</title>
+  <title>⚠ DESCONEXIÓN INMINENTE</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&display=swap');
 
     body {
       margin: 0;
       padding: 0;
-      background: #0d0d0d;
+      background: black;
       color: #e0e0e0;
       font-family: 'Space Grotesk', sans-serif;
       text-align: center;
@@ -23,7 +23,7 @@
       letter-spacing: 2px;
       text-shadow: 0 0 10px red, 0 0 15px blue;
       margin-top: 20px;
-      animation: shadowMove 3s infinite alternate, glitch 3s infinite;
+      animation: glitch 0.5s infinite alternate, fade 3s infinite alternate;
     }
 
     .chat-container {
@@ -34,6 +34,7 @@
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
       backdrop-filter: blur(6px);
+      position: relative;
     }
 
     .messages {
@@ -55,99 +56,16 @@
       backdrop-filter: blur(2px);
     }
 
-    .user {
-      background-color: rgba(0, 123, 255, 0.2);
-      text-align: right;
-      color: #a9c5ff;
-      margin-left: auto;
-      border-left: 3px solid #007bff;
-    }
-
     .bot {
-      background-color: rgba(220, 53, 69, 0.2);
-      text-align: left;
       color: #ff9b9b;
-      margin-right: auto;
-      border-right: 3px solid #dc3545;
-      animation: flicker 3s infinite alternate;
+      animation: flicker 2s infinite alternate;
     }
 
-    .inputs {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-
-    input {
-      flex-grow: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      background: rgba(30, 30, 30, 0.8);
-      color: white;
-      font-family: inherit;
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    input:focus {
-      box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-    }
-
-    button {
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      background: red;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      background: darkred;
-      box-shadow: 0 0 12px red;
-    }
-
-    .inventory {
-      text-align: left;
-      margin-top: 10px;
-      padding: 10px;
-      background: rgba(20, 20, 20, 0.7);
-      border-radius: 8px;
-      max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-      border-left: 2px solid rgba(255, 0, 0, 0.5);
-    }
-
-    .inventory ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .footer {
-      font-size: 0.8rem;
-      margin-top: 10px;
-      opacity: 0.8;
-    }
-
-    /* 🔥 Sombras en movimiento */
-    @keyframes shadowMove {
-      0% { text-shadow: 0 0 10px red, 0 0 15px blue; }
-      100% { text-shadow: 2px 2px 15px cyan, -2px -2px 15px magenta; }
-    }
-
-    /* 👻 Parpadeo del texto del bot */
     @keyframes flicker {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+      50% { opacity: 0.3; }
     }
 
-    /* 📺 Pequeño efecto glitch */
     @keyframes glitch {
       0% { transform: translate(0, 0); }
       20% { transform: translate(-2px, 2px); }
@@ -156,10 +74,15 @@
       80% { transform: translate(2px, -2px); }
       100% { transform: translate(0, 0); }
     }
+
+    @keyframes fade {
+      0% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
   </style>
 </head>
 <body>
-  <h1>Doppelgänger</h1>
+  <h1 id="title">Doppelgänger</h1>
 
   <main class="chat-container">
     <div class="messages" id="messages"></div>
@@ -169,53 +92,83 @@
       <button id="sendButton">Enviar</button>
     </div>
 
-    <div class="inventory">
-      <strong>Inventario:</strong>
-      <ul id="inventory">
-        <li>Nada aún...</li>
-      </ul>
-    </div>
-
-    <div class="footer">Un susurro detrás de ti...</div>
+    <div class="footer">Desconexión en proceso...</div>
   </main>
 
   <script>
     const messagesEl = document.getElementById("messages");
     const userInputEl = document.getElementById("userInput");
     const sendButtonEl = document.getElementById("sendButton");
+    const titleEl = document.getElementById("title");
 
-    function playSound(frequency) {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      oscillator.type = "square";
-      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-      oscillator.connect(audioContext.destination);
-      oscillator.start();
-      setTimeout(() => oscillator.stop(), 100);
-    }
+    let corruptionLevel = 0;
 
     function sendMessage() {
       const messageText = userInputEl.value.trim();
       if (messageText === "") return;
 
       addMessage(messageText, "user");
-      playSound(800); // Sonido al escribir
+
       userInputEl.value = "";
 
       setTimeout(() => {
-        addMessage(generateResponse(), "bot");
-        playSound(500); // Sonido respuesta del bot
-      }, 600);
+        const botResponse = generateResponse(messageText);
+        addMessage(botResponse, "bot");
+        increaseCorruption();
+      }, 1000);
     }
 
-    function generateResponse() {
+    function generateResponse(userMessage) {
+      if (userMessage.toLowerCase().includes("desconectar")) {
+        triggerFinale();
+        return "DESCONECTANDO...";
+      }
+
       const horrorMessages = [
-        "Las sombras se mueven sin tu permiso...",
-        "Un eco distante repite tu nombre...",
-        "Tu reflejo en el monitor parpadea antes que tú...",
-        "Hay un error en la realidad... o en ti..."
+        "No hay salida.",
+        "¿Por qué sigues aquí?",
+        "Tú no escribiste ese mensaje.",
+        "El reflejo no eres tú.",
+        "Esto no es un juego.",
+        "Te he visto antes.",
+        "Tu voz suena extraña.",
+        "Hay alguien más aquí.",
+        "El código se está rompiendo..."
       ];
+
       return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
+    }
+
+    function increaseCorruption() {
+      corruptionLevel++;
+      document.body.style.filter = `blur(${corruptionLevel / 5}px) contrast(${100 + corruptionLevel * 5}%)`;
+      
+      if (corruptionLevel === 10) {
+        titleEl.innerText = "⚠ RECONSTRUYENDO REALIDAD ⚠";
+        document.body.style.background = "#330033";
+      }
+      if (corruptionLevel > 15) {
+        document.body.style.transform = "rotate(1deg)";
+      }
+
+      if (corruptionLevel > 20) {
+        messagesEl.innerHTML += `<div class="message bot">Esto no debería estar pasando...</div>`;
+        setTimeout(() => triggerFinale(), 5000);
+      }
+    }
+
+    function triggerFinale() {
+      document.body.style.background = "black";
+      titleEl.innerText = "⚠ ERROR FATAL ⚠";
+      messagesEl.innerHTML = "<h2>El Doppelgänger ha escapado...</h2>";
+
+      setInterval(() => {
+        document.body.style.background = document.body.style.background === "black" ? "red" : "black";
+      }, 300);
+
+      setTimeout(() => {
+        document.body.innerHTML = "<h1>☠ CONEXIÓN PERDIDA ☠</h1>";
+      }, 8000);
     }
 
     function addMessage(text, sender) {
@@ -224,6 +177,13 @@
       messageDiv.textContent = text;
       messagesEl.appendChild(messageDiv);
       messagesEl.scrollTop = messagesEl.scrollHeight;
+
+      if (sender === "bot") {
+        setTimeout(() => {
+          messageDiv.style.opacity = 0;
+          setTimeout(() => messageDiv.remove(), 3000);
+        }, Math.random() * 6000 + 2000);
+      }
     }
 
     sendButtonEl.addEventListener("click", sendMessage);
