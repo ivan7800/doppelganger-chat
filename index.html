@@ -176,6 +176,7 @@
                 document.getElementById("chat-container").style.opacity = "1";
                 document.getElementById("saludo").textContent = `Bienvenido, ${nombreUsuario}`;
                 habilitarChat();
+                cargarMensajes();
             }, 1000);
         }
 
@@ -189,26 +190,36 @@
             let input = document.getElementById("userInput");
             let message = input.value.trim();
             if (message === "") return;
-            // Lógica para enviar mensaje aquí...
+
+            let chatBox = document.getElementById("messages");
+
+            let userMessage = document.createElement("div");
+            userMessage.classList.add("message", "user");
+            userMessage.textContent = message;
+            chatBox.appendChild(userMessage);
+
+            let botResponse = document.createElement("div");
+            botResponse.classList.add("message", "bot");
+            botResponse.textContent = generarRespuesta(message);
+            chatBox.appendChild(botResponse);
+
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+            guardarMensajes();
         }
 
-        function cambiarUsuario() {
-            document.getElementById("chat-container").style.opacity = "0";
-            setTimeout(() => {
-                localStorage.removeItem("nombreUsuario");
-                location.reload();
-            }, 500);
+        function generarRespuesta(input) {
+            let respuestas = ["Interesante...", "Cuéntame más...", "Eso suena misterioso.", "¿Qué más tienes en mente?"];
+            return respuestas[Math.floor(Math.random() * respuestas.length)];
         }
 
-        window.onload = function() {
-            let nombreGuardado = localStorage.getItem("nombreUsuario");
-            if (nombreGuardado) {
-                document.getElementById("portada").style.display = "none";
-                document.getElementById("chat-container").style.opacity = "1";
-                document.getElementById("saludo").textContent = `Bienvenido de nuevo, ${nombreGuardado}`;
-                habilitarChat();
-            }
-        };
+        function guardarMensajes() {
+            localStorage.setItem("chat", document.getElementById("messages").innerHTML);
+        }
+
+        function cargarMensajes() {
+            document.getElementById("messages").innerHTML = localStorage.getItem("chat") || "";
+        }
     </script>
 </body>
 </html>
