@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doppelgänger Mejorado</title>
+  <title>Doppelgänger en acción</title>
   <style>
     body {
       margin: 0;
@@ -73,6 +73,24 @@
       margin-top: 10px;
       opacity: 0.8;
     }
+    .inventory {
+      text-align: left;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid red;
+      border-radius: 5px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .inventory ul {
+      list-style: none;
+      padding: 0;
+    }
+    .inventory li {
+      padding: 5px;
+      border-bottom: 1px solid red;
+    }
   </style>
 </head>
 <body>
@@ -82,29 +100,33 @@
     <div class="messages" id="messages" aria-live="polite" aria-atomic="true"></div>
 
     <div class="inputs">
-      <input type="text" id="userInput" placeholder="Escribe tu mensaje..." autocomplete="off" />
+      <input type="text" id="userInput" placeholder="Escribe tu mensaje (Ej: 'mirar espejo')..." autocomplete="off" aria-label="Escribe un mensaje al Doppelgänger" />
       <button id="sendButton">Enviar</button>
+    </div>
+
+    <div class="inventory">
+      <strong>Inventario:</strong>
+      <ul id="inventory">
+        <li>Nada aún...</li>
+      </ul>
     </div>
 
     <div class="footer">Chat de horror interactivo</div>
   </main>
 
   <script>
-    /* ================================
-       Variables y Configuración
-    ================================ */
     const messagesEl = document.getElementById("messages");
     const userInputEl = document.getElementById("userInput");
     const sendButtonEl = document.getElementById("sendButton");
+    const inventoryEl = document.getElementById("inventory");
 
     let gameState = 0;  
     let userName = "";
     let fearLevel = 0;
     let inventory = { flashlight: false };
     let messageCount = 0;
-    const MAX_MESSAGES = 20; 
+    const MAX_MESSAGES = 20;
 
-    // Comandos para avanzar en la historia
     const commands = {
       mirror: ["mirar espejo", "examinar espejo", "ver espejo"],
       light: ["encender luz", "buscar interruptor"],
@@ -113,7 +135,6 @@
       door: ["abrir puerta", "examinar puerta"],
     };
 
-    // Mensajes aleatorios de horror
     const horrorMessages = [
       "Las sombras se mueven sin tu permiso.",
       "Un eco distante repite tu nombre.",
@@ -121,9 +142,6 @@
       "Hay un reflejo que parpadea sin que tú lo hagas.",
     ];
 
-    /* ================================
-       Listeners Principales
-    ================================ */
     sendButtonEl.addEventListener("click", sendMessage);
     userInputEl.addEventListener("keydown", function(event) {
       if (event.key === "Enter") {
@@ -131,9 +149,6 @@
       }
     });
 
-    /* ================================
-       Función Principal del Chat
-    ================================ */
     function sendMessage() {
       const messageText = userInputEl.value.trim();
       if (messageText === "") return;
@@ -169,14 +184,16 @@
       if (gameState === 1) {
         if (checkCommand(userMessage, commands.mirror)) {
           fearLevel += 2;
-          return "Te acercas al espejo... tu reflejo parpadea antes que tú. (Temor: " + fearLevel + ")";
+          return `Te acercas al espejo... tu reflejo parpadea antes que tú. (Temor: ${fearLevel})`;
         }
         if (checkCommand(userMessage, commands.pickUpFlashlight)) {
           inventory.flashlight = true;
+          updateInventory();
           return "Recoges una linterna vieja. Su luz es tenue, pero parece útil.";
         }
         if (checkCommand(userMessage, commands.light)) {
           inventory.flashlight = true;
+          updateInventory();
           return "Encuentras una linterna. Ahora puedes iluminar los pasillos oscuros.";
         }
         if (checkCommand(userMessage, commands.back)) {
@@ -185,32 +202,14 @@
         }
       }
 
-      if (gameState === 2) {
-        if (checkCommand(userMessage, commands.door)) {
-          gameState = 3;
-          return "Encuentras una puerta cerrada. Hay algo al otro lado...";
-        }
-        return "El pasillo parece interminable... Escuchas pasos detrás de ti.";
-      }
-
-      if (gameState === 3) {
-        if (/forzar|golpear|abrir con fuerza/i.test(userMessage)) {
-          if (Math.random() < 0.5) {
-            gameState = 4;
-            return "Con un crujido siniestro, la puerta cede. Al otro lado hay un túnel...";
-          } else {
-            fearLevel += 3;
-            return "Empujas la puerta con fuerza, pero algo la bloquea desde dentro.";
-          }
-        }
+      if (gameState === 2 && checkCommand(userMessage, commands.door)) {
+        gameState = 3;
+        return "Encuentras una puerta cerrada. Hay algo al otro lado...";
       }
 
       return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
     }
 
-    /* ================================
-       Funciones de Apoyo
-    ================================ */
     function addMessage(text, sender) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
@@ -223,8 +222,15 @@
       return commandList.some(command => userMessage.toLowerCase().includes(command));
     }
 
+    function updateInventory() {
+      inventoryEl.innerHTML = Object.entries(inventory)
+        .filter(([item, has]) => has)
+        .map(([item]) => `<li>${item}</li>`)
+        .join("") || "<li>Nada aún...</li>";
+    }
+
     function triggerEnd(text) {
-      document.body.innerHTML = `<h1>${text}</h1>`;
+      addMessage(text, "bot");
       setTimeout(() => location.reload(), 5000);
     }
   </script>
