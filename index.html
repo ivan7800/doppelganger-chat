@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚠️ ERROR 666</title>
+  <title>⚠️ DOPPELGÄNGER PROHIBIDO</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -52,6 +52,11 @@
       max-width: 80%;
       word-wrap: break-word;
       font-family: 'Press Start 2P', cursive;
+      position: relative;
+    }
+
+    .glitch-effect {
+      animation: glitchText 0.2s infinite alternate;
     }
 
     .user {
@@ -77,38 +82,45 @@
       40% { transform: translate(2px, -2px); }
       100% { transform: translate(0, 0); }
     }
+
+    @keyframes glitchText {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(-1px, 1px) skewX(5deg); }
+      100% { transform: translate(1px, -1px) skewX(-5deg); }
+    }
   </style>
 </head>
 <body>
-  <h1 id="title">Doppelgänger</h1>
+  <h1 id="title">⚠ DOPPELGÄNGER PROHIBIDO ⚠</h1>
 
   <main class="chat-container">
     <div class="messages" id="messages"></div>
     <div class="inputs">
-      <input type="text" id="userInput" placeholder="Escribe aquí..." autocomplete="off" style="background: #000; color: #00ff00; border: 2px solid #00ff00; font-family: 'Press Start 2P', cursive; padding: 5px;" />
-      <button id="sendButton" style="background: #8800ff; color: #00ff00; border: 2px solid #00ff00; font-family: 'Press Start 2P', cursive;">Enviar</button>
+      <input type="text" id="userInput" placeholder="Susurra tu pregunta..." autocomplete="off" />
+      <button id="sendButton">Consultar</button>
     </div>
   </main>
-
-  <audio id="horrorSound" src="https://www.myinstants.com/media/sounds/creepy.mp3" preload="auto"></audio>
-  <audio id="errorSound" src="https://www.myinstants.com/media/sounds/error.mp3" preload="auto"></audio>
 
   <script>
     const messagesEl = document.getElementById("messages");
     const userInputEl = document.getElementById("userInput");
     const sendButtonEl = document.getElementById("sendButton");
     const titleEl = document.getElementById("title");
-    const horrorSound = document.getElementById("horrorSound");
-    const errorSound = document.getElementById("errorSound");
+    let userHistory = [];
+    let ritualActive = false;
+    let hiddenRitual = false;
+    let hintCounter = 0;
 
     function sendMessage() {
       const messageText = userInputEl.value.trim();
       if (messageText === "") return;
+
       addMessage(messageText, "user");
+      userHistory.push(messageText.toLowerCase());
       userInputEl.value = "";
-      
+
       setTimeout(() => {
-        const botResponse = generateResponse(messageText);
+        const botResponse = generateResponse(messageText.toLowerCase());
         addMessage(botResponse, "bot");
       }, 1000);
     }
@@ -118,41 +130,48 @@
         triggerError666();
         return "NO DEBISTE ESCRIBIR ESO.";
       }
-      
-      if (Math.random() < 0.2) {
-        return `¿${userMessage}? No, eso no lo escribiste tú.`;
+
+      if (userMessage === "manifiéstate") {
+        ritualActive = true;
+        return "El ritual ha comenzado... pero debes encontrar el siguiente paso.";
       }
 
+      if (userMessage.includes("quién eres")) {
+        return "Eres tú. Pero no del todo...";
+      }
+
+      if (userMessage.includes("cómo salgo de aquí")) {
+        setTimeout(() => { location.reload(); }, 3000);
+        return "Demasiado tarde... El otro tú ya ha tomado tu lugar.";
+      }
+
+      if (userMessage === "vezreth vezreth vezreth") {
+        hiddenRitual = true;
+        return "Has despertado algo que no entiende el tiempo... y ahora hay dos de ti.";
+      }
+
+      if (hintCounter % 5 === 0) {
+        return "Escucha los susurros. Pregunta sobre el 'reflejo distorsionado'...";
+      }
+      hintCounter++;
+
       const horrorMessages = [
-        "Las sombras se están acercando...",
-        "Tu reflejo se ha movido...",
-        "Escucho tu respiración detrás de ti...",
-        "Los susurros han aumentado...",
-        "No puedes salir ahora.",
-        "Una voz en la estática dice tu nombre..."
+        "El Doppelgänger te observa...",
+        "Algo ha escrito por ti... ¿lo viste?",
+        "No recuerdas escribir esto, ¿verdad?",
+        "Los textos antiguos hablaban de algo llamado Vezreth...",
+        "El último en consultarme nunca regresó... pero alguien parecido apareció en su lugar...",
+        "Solo quedan ecos de lo que alguna vez fue tu mente...",
+        "No estás escribiendo solo. Algo más está escribiendo contigo...",
+        "ɘsoɿʎƚsɘɿ ǫnƃɘ ɿɘɿɘnɘᗡ"
       ];
-      horrorSound.play();
       return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
     }
 
     function triggerError666() {
       document.body.style.background = "purple";
       titleEl.innerText = "⚠ ERROR 666 ⚠";
-      errorSound.play();
-      setInterval(() => {
-        document.body.style.background = document.body.style.background === "black" ? "purple" : "black";
-      }, 500);
-      setTimeout(() => {
-        location.reload();
-      }, 5000);
     }
-
-    function changeTitle() {
-      const titles = ["Doppelgänger", "¿Quién está ahí?", "ERROR 404", "Tu reflejo", "Veo todo", "666" ];
-      titleEl.innerText = titles[Math.floor(Math.random() * titles.length)];
-    }
-
-    setInterval(changeTitle, 3000);
 
     function addMessage(text, sender) {
       const messageDiv = document.createElement("div");
@@ -162,9 +181,19 @@
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
+    setInterval(() => {
+      if (ritualActive || hiddenRitual || Math.random() < 0.3) {
+        const botMessage = generateResponse("");
+        addMessage(botMessage, "bot");
+      }
+    }, 7000);
+
     sendButtonEl.addEventListener("click", sendMessage);
     userInputEl.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") sendMessage();
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendMessage();
+      }
     });
   </script>
 </body>
