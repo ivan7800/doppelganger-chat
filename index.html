@@ -149,32 +149,34 @@
 
   <script>
     /* =====================================
-       Variables globales y Configuración
+       Variables y Configuración
     ===================================== */
     const messagesEl = document.getElementById("messages");
     const userInputEl = document.getElementById("userInput");
     const sendButtonEl = document.getElementById("sendButton");
     const presenceEl = document.getElementById("presence");
 
-    const MAX_MESSAGES = 20; // Límite de mensajes para “final terrorífico” genérico
+    // Límite de mensajes antes de forzar "final terrorífico"
+    const MAX_MESSAGES = 20;
     let messageCount = 0;
 
     // Estados de juego:
-    // 0 => usuario no ha introducido nombre
-    // 1 => intro completa, sala con espejo
+    // 0 => aún no se ha introducido el nombre
+    // 1 => sala con espejo
     // 2 => pasillo
     // 3 => puerta cerrada
-    // 4 => acceso a final “bueno” (si se cumplen condiciones)
-    // 99 => placeholder (se podría usar para más escenas)
-    let gameState = 0;
+    // 4 => final “bueno” (si condiciones se cumplen)
+    let gameState = 0;  // estado inicial
     let userName = "";
-    let fearLevel = 0; // Subirá con ciertos eventos y la inactividad
+    let fearLevel = 0;  // sube al asustarse o inactividad
+
+    // Inventario simple
     let inventory = {
-      flashlight: false, // linterna
+      flashlight: false
     };
 
-    // Sinónimos para entender más entradas:
-    // El bot buscará en estos arrays para determinar qué acción realiza el usuario.
+    // Sinónimos para reconocer acciones. Si se quiere más flexibilidad,
+    // se amplían estos arrays o se añade otra lógica.
     const synonyms = {
       mirror: ["mirar espejo","examinar espejo","observar espejo","ver espejo"],
       light: ["encender luz","prender luz","buscar interruptor","prender foco"],
@@ -184,7 +186,7 @@
       door:  ["abrir puerta","examinar puerta","mirar puerta","tocar puerta"]
     };
 
-    // Mensajes genéricos de horror
+    // Mensajes “genéricos” de horror
     const surpriseMessages = [
       "Las sombras se mueven sin tu permiso.",
       "Un eco distante repite tu nombre.",
@@ -194,159 +196,170 @@
       "Un susurro muy cerca de tu oído... ¿lo escuchaste?"
     ];
 
-    // Timer para inactividad
+    // Temporizador para inactividad
     let inactivityTimer;
-    const INACTIVITY_LIMIT = 15_000; // 15 segundos
+    const INACTIVITY_LIMIT = 15000; // 15 segundos
 
-    /* =============================
-       Listeners principales
-    ============================= */
+    // Evento: Click en botón Enviar
     sendButtonEl.addEventListener("click", sendMessage);
+
+    // Evento: Presionar Enter en el input
     userInputEl.addEventListener("keydown", function(event) {
       if (event.key === "Enter") {
         sendMessage();
       }
     });
 
-    // Cada vez que el usuario interactúe, reseteamos el temporizador
+    // Resetear temporizador de inactividad al hacer click o escribir
     document.addEventListener("click", resetInactivityTimer);
     document.addEventListener("keydown", resetInactivityTimer);
 
+    // Iniciamos el timer
     startInactivityTimer();
 
-    /* =============================
+    /* =====================================
        Funciones Principales
-    ============================= */
+    ===================================== */
     function sendMessage() {
       const messageText = userInputEl.value.trim();
-      if (messageText === "") return;
+      if (messageText === "") return; // No hacemos nada si está vacío
 
+      // Añade el mensaje del usuario
       addMessage(messageText, "user");
+
+      // Limpia el input
       userInputEl.value = "";
 
+      // Retardo antes de responder (efecto “pensar”)
       setTimeout(() => {
         const botResponse = generateResponse(messageText);
         addMessage(botResponse, "bot");
       }, 500 + Math.random() * 1000);
     }
 
+    // Lógica principal de la narrativa
     function generateResponse(userMessage) {
       messageCount++;
 
-      // Chequeo: si fearLevel es muy alto, dispara final antes de llegar a MAX_MESSAGES
+      // Si el fearLevel es demasiado alto, final “malo” inmediato
       if (fearLevel >= 10) {
-        triggerDoppelgangerAttack("El temor te consume por completo... Tu Doppelgänger toma posesión de tu cuerpo.");
+        triggerDoppelgangerAttack(
+          "El temor te consume por completo... Tu Doppelgänger toma posesión de tu cuerpo."
+        );
         return "…";
       }
 
-      // Primer estado: usuario no ha dado su nombre
+      // Estado 0: el usuario no ha introducido el nombre
       if (gameState === 0) {
         userName = userMessage;
         gameState = 1;
         return `Bienvenido, ${userName}. Una sombra familiar te observa en este lugar oscuro...`;
       }
 
-      // Segundo estado: sala con espejo (gameState = 1)
+      // Estado 1: sala con espejo
       if (gameState === 1) {
-        // Transición a pasillo si el usuario “retrocede” o si insiste en explorar más
-        // Revisamos acciones usando la función checkSynonyms()
         if (checkSynonyms(userMessage, synonyms.mirror)) {
           fearLevel += 2;
-          return "Te acercas al espejo... Tu reflejo parpadea con vida propia. (Temor: " + fearLevel + ")";
+          return `Te acercas al espejo... Tu reflejo parpadea con vida propia. (Temor: ${fearLevel})`;
         } 
         else if (checkSynonyms(userMessage, synonyms.light)) {
-          // Podrías encontrar la linterna
+          // Encuentra linterna
           inventory.flashlight = true;
-          return "Buscas un interruptor y encuentras una linterna vieja. Ahora la tienes en tu inventario. (Temor: " + fearLevel + ")";
-        } 
+          return `Buscas un interruptor y encuentras una linterna vieja. Ahora está en tu inventario. (Temor: ${fearLevel})`;
+        }
         else if (checkSynonyms(userMessage, synonyms.pickUpFlashlight)) {
           inventory.flashlight = true;
-          return "Recoges la linterna. Notas que aún funciona aunque la luz es tenue. (Temor: " + fearLevel + ")";
+          return `Recoges la linterna. Aún funciona, aunque la luz es tenue. (Temor: ${fearLevel})`;
         }
         else if (checkSynonyms(userMessage, synonyms.back)) {
-          // Avanzamos al pasillo (gameState = 2)
+          // Pasa al pasillo
           gameState = 2;
-          return "Te alejas del espejo y sales al pasillo principal. Se escucha un susurro al fondo.";
-        } 
+          return "Te alejas del espejo y sales al pasillo principal. Escuchas un susurro al fondo...";
+        }
         else {
-          // Por defecto, un mensaje tenebroso
+          // Acción no reconocida => respuesta genérica
           return randomHorrorResponse();
         }
       }
 
-      // Tercer estado: pasillo (gameState = 2)
+      // Estado 2: pasillo
       if (gameState === 2) {
         if (checkSynonyms(userMessage, synonyms.door)) {
-          // Avanzamos al gameState 3
           gameState = 3;
-          return "Te acercas a una puerta vieja y desgastada. Está cerrada, pero escuchas algo al otro lado...";
-        } 
+          return "Te acercas a una puerta vieja y desgastada. Está cerrada, pero algo se mueve detrás...";
+        }
         else if (checkSynonyms(userMessage, synonyms.mirror)) {
           fearLevel++;
-          return "No hay espejos aquí, pero sientes que algo te observa desde la oscuridad. (Temor: " + fearLevel + ")";
+          return `No hay espejos aquí, pero sientes que algo te observa... (Temor: ${fearLevel})`;
         }
         else if (inventory.flashlight && checkSynonyms(userMessage, synonyms.light)) {
-          return "Enciendes la linterna. El haz de luz revela paredes llenas de marcas de garras. (Temor: " + fearLevel + ")";
-        } 
+          return `Enciendes la linterna. Sus destellos revelan marcas de garras en las paredes. (Temor: ${fearLevel})`;
+        }
         else {
           return randomHorrorResponse();
         }
       }
 
-      // Cuarto estado: puerta cerrada (gameState = 3)
+      // Estado 3: puerta cerrada
       if (gameState === 3) {
+        // Si se escribe "forzar", "golpear", "abrir con fuerza", etc.
         if (/forzar|golpear|abrir con fuerza/i.test(userMessage)) {
-          // Pequeña probabilidad de abrir la puerta
           if (Math.random() < 0.5) {
-            // Éxito: pasa al gameState 4 (posible final “bueno”)
+            // Éxito => pasa a estado 4
             gameState = 4;
-            return "Con un crujido siniestro, la puerta cede. Al otro lado, ves un pasaje que conduce a la salida...";
+            return "Con un crujido siniestro, la puerta cede. Al otro lado, un pasaje conduce a la salida...";
           } else {
             fearLevel += 3;
-            return "Empujas con fuerza, pero la puerta se resiste. Cruje de forma amenazante. (Temor: " + fearLevel + ")";
+            return `Empujas con fuerza, pero la puerta se resiste. Cruje amenazante. (Temor: ${fearLevel})`;
           }
-        } 
+        }
         else if (/escuchar|oír|oigo/i.test(userMessage)) {
           fearLevel++;
-          return "Pegas el oído a la puerta... se oyen rasguños y una respiración entrecortada. (Temor: " + fearLevel + ")";
+          return `Pegas el oído a la puerta... rasguños y una respiración entrecortada se oyen al otro lado. (Temor: ${fearLevel})`;
         }
         else if (checkSynonyms(userMessage, synonyms.back)) {
           // Regresa al pasillo
           gameState = 2;
-          return "Regresas al pasillo, dejando la puerta atrás... (Temor: " + fearLevel + ")";
+          return `Regresas al pasillo, dejando la puerta atrás... (Temor: ${fearLevel})`;
         }
         else {
           return randomHorrorResponse();
         }
       }
 
-      // Quinto estado: acceso a final “bueno” (gameState = 4)
+      // Estado 4: acceso a final “bueno”
       if (gameState === 4) {
-        // Ejemplo de final alternativo si tienes la linterna:
+        // Si tiene linterna => final bueno
         if (inventory.flashlight) {
-          // Final de escape
-          triggerGoodEnding("Encuentras un túnel iluminado por tu linterna... Logras escapar mientras el reflejo desaparece.");
+          triggerGoodEnding(
+            "Encuentras un túnel iluminado por tu linterna... logras escapar mientras el reflejo desvanece."
+          );
           return "…";
         } else {
-          // Final “malo” si no tienes linterna
-          triggerDoppelgangerAttack("Sin luz, te adentras en la penumbra... Tu propio eco te responde, y la oscuridad te atrapa.");
+          // Si no tiene linterna => final malo
+          triggerDoppelgangerAttack(
+            "Sin luz, te adentras en la penumbra... Tu propio eco te responde y la oscuridad te atrapa."
+          );
           return "…";
         }
       }
 
-      // Si supera el número máximo de mensajes, también dispara un final
+      // Si excedemos el número de mensajes, final terrorífico
       if (messageCount > MAX_MESSAGES) {
-        triggerDoppelgangerAttack("El número de susurros supera toda lógica. El Doppelgänger toma el control total...");
+        triggerDoppelgangerAttack(
+          "El número de susurros supera toda lógica. El Doppelgänger toma el control total..."
+        );
         return "…";
       }
 
-      // Por si hay otros estados que no hemos cubierto (ej. gameState > 4):
+      // Por si hubiera estados extra (p. ej. 5, 6...), o no reconoció nada
       return randomHorrorResponse();
     }
 
-    /* =============================
+    /* =====================================
        Funciones de Apoyo
-    ============================= */
+    ===================================== */
+    // Agrega un mensaje al contenedor
     function addMessage(text, sender) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
@@ -355,29 +368,36 @@
       }
       messageDiv.textContent = text;
       messagesEl.appendChild(messageDiv);
+      
+      // Forzamos el scroll al final
       setTimeout(() => {
         messagesEl.scrollTop = messagesEl.scrollHeight;
       }, 100);
     }
 
+    // Mensaje genérico de horror (cuando no se reconoce acción)
     function randomHorrorResponse() {
       const randomIndex = Math.floor(Math.random() * surpriseMessages.length);
       let response = surpriseMessages[randomIndex];
-      // Con cierta probabilidad, invierte parcialmente
+      // Probabilidad de invertir parte del texto (efecto "glitch")
       if (Math.random() < 0.3) {
         response = flipText(response);
       }
-      return response + " (Temor: " + fearLevel + ")";
+      return response + ` (Temor: ${fearLevel})`;
     }
 
+    // Invertir parcialmente el texto para efecto de confusión
     function flipText(text) {
       return text
         .split(" ")
-        .map(word => Math.random() < 0.5 ? word.split("").reverse().join("") : word)
+        .map(word => Math.random() < 0.5
+          ? word.split("").reverse().join("")
+          : word
+        )
         .join(" ");
     }
 
-    // Checa si userMessage coincide con alguno de los sinónimos en el array
+    // Verifica si userMessage incluye alguna de las cadenas en synonymsArray
     function checkSynonyms(userMessage, synonymsArray) {
       userMessage = userMessage.toLowerCase();
       for (let i = 0; i < synonymsArray.length; i++) {
@@ -388,22 +408,22 @@
       return false;
     }
 
-    // Temporizador de inactividad: si pasa X tiempo sin interacción, sube fearLevel
+    // Timer de inactividad: aumenta el fearLevel si el usuario no interactúa
     function startInactivityTimer() {
       inactivityTimer = setTimeout(() => {
-        fearLevel += 2; // penaliza inactividad
-        addMessage("El silencio prolongado intensifica tu ansiedad... (Temor: " + fearLevel + ")", "bot");
+        fearLevel += 2;
+        addMessage(`El silencio prolongado intensifica tu ansiedad... (Temor: ${fearLevel})`, "bot");
       }, INACTIVITY_LIMIT);
     }
 
+    // Resetear el timer al detectar actividad
     function resetInactivityTimer() {
       clearTimeout(inactivityTimer);
       startInactivityTimer();
     }
 
-    // Final “malo” forzado por Doppelgänger
+    // Final malo forzado por Doppelgänger
     function triggerDoppelgangerAttack(text) {
-      // Oscurecer pantalla
       document.body.classList.add("dark-flash");
       presenceEl.style.opacity = "1";
       document.title = "ERROR: Doppelgänger Suelto";
@@ -415,6 +435,7 @@
             ¡El Doppelgänger te ha consumido!
           </h1>
         `;
+        // Reinicia la página tras 5 segundos
         setTimeout(() => location.reload(), 5000);
       }, 2000);
     }
@@ -432,6 +453,7 @@
             ¡Escapas de tu propio reflejo!
           </h1>
         `;
+        // Reinicia la página tras 5 segundos
         setTimeout(() => location.reload(), 5000);
       }, 2000);
     }
