@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Doppelgänger Mejorado</title>
   <style>
-    /* ================================
-       Estilos Generales
-    ================================ */
     body {
       margin: 0;
       padding: 0;
@@ -23,17 +20,6 @@
       animation: glitch 0.1s infinite alternate;
       margin-top: 20px;
     }
-    @keyframes glitch {
-      0%   { transform: translate(0, 0); }
-      20%  { transform: translate(-2px, 2px); }
-      40%  { transform: translate(2px, -2px); }
-      60%  { transform: translate(-1px, 1px); }
-      80%  { transform: translate(1px, -1px); }
-      100% { transform: translate(0, 0); }
-    }
-    /* ================================
-       Contenedor del Chat
-    ================================ */
     .chat-container {
       max-width: 500px;
       margin: 20px auto;
@@ -41,7 +27,6 @@
       background-color: rgba(0, 0, 0, 0.85);
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-      position: relative;
     }
     .messages {
       height: 300px;
@@ -55,13 +40,7 @@
       border-radius: 5px;
       margin: 5px;
       font-size: 1rem;
-      opacity: 0;
-      animation: fadeIn 0.5s forwards;
       width: fit-content;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
     }
     .user {
       background-color: #007bff;
@@ -94,28 +73,16 @@
       margin-top: 10px;
       opacity: 0.8;
     }
-    /* ================================
-       Efecto de Pantalla Oscura
-    ================================ */
-    .dark-flash {
-      filter: brightness(0);
-      transition: filter 0.3s;
-    }
   </style>
 </head>
 <body>
   <h1>Doppelgänger Mejorado</h1>
 
-  <main role="main" class="chat-container">
+  <main class="chat-container">
     <div class="messages" id="messages" aria-live="polite" aria-atomic="true"></div>
 
     <div class="inputs">
-      <input 
-        type="text" 
-        id="userInput" 
-        placeholder="Escribe tu mensaje..." 
-        autocomplete="off" 
-        aria-label="Introduce tu mensaje" />
+      <input type="text" id="userInput" placeholder="Escribe tu mensaje..." autocomplete="off" />
       <button id="sendButton">Enviar</button>
     </div>
 
@@ -137,8 +104,8 @@
     let messageCount = 0;
     const MAX_MESSAGES = 20; 
 
-    // Sinónimos para detectar comandos
-    const synonyms = {
+    // Comandos para avanzar en la historia
+    const commands = {
       mirror: ["mirar espejo", "examinar espejo", "ver espejo"],
       light: ["encender luz", "buscar interruptor"],
       back: ["retroceder", "volver"],
@@ -146,7 +113,7 @@
       door: ["abrir puerta", "examinar puerta"],
     };
 
-    // Mensajes de horror
+    // Mensajes aleatorios de horror
     const horrorMessages = [
       "Las sombras se mueven sin tu permiso.",
       "Un eco distante repite tu nombre.",
@@ -165,7 +132,7 @@
     });
 
     /* ================================
-       Funciones Principales
+       Función Principal del Chat
     ================================ */
     function sendMessage() {
       const messageText = userInputEl.value.trim();
@@ -196,43 +163,64 @@
       if (gameState === 0) {
         userName = userMessage;
         gameState = 1;
-        return `Bienvenido, ${userName}. Una sombra observa desde el espejo...`;
+        return `Bienvenido, ${userName}. Una sombra observa desde el espejo... Es difícil distinguir su rostro. ¿Te acercas al espejo o buscas una luz?`;
       }
 
       if (gameState === 1) {
-        if (checkSynonyms(userMessage, synonyms.mirror)) {
+        if (checkCommand(userMessage, commands.mirror)) {
           fearLevel += 2;
-          return "Te acercas al espejo... tu reflejo se mueve antes que tú. (Temor: " + fearLevel + ")";
+          return "Te acercas al espejo... tu reflejo parpadea antes que tú. (Temor: " + fearLevel + ")";
         }
-        if (checkSynonyms(userMessage, synonyms.pickUpFlashlight)) {
+        if (checkCommand(userMessage, commands.pickUpFlashlight)) {
           inventory.flashlight = true;
-          return "Recoges una linterna vieja.";
+          return "Recoges una linterna vieja. Su luz es tenue, pero parece útil.";
         }
-        if (checkSynonyms(userMessage, synonyms.back)) {
+        if (checkCommand(userMessage, commands.light)) {
+          inventory.flashlight = true;
+          return "Encuentras una linterna. Ahora puedes iluminar los pasillos oscuros.";
+        }
+        if (checkCommand(userMessage, commands.back)) {
           gameState = 2;
-          return "Te alejas del espejo y entras a un pasillo oscuro...";
+          return "Te alejas del espejo y entras en un pasillo oscuro... el aire es denso.";
         }
       }
 
       if (gameState === 2) {
-        if (checkSynonyms(userMessage, synonyms.door)) {
+        if (checkCommand(userMessage, commands.door)) {
           gameState = 3;
-          return "Encuentras una puerta cerrada...";
+          return "Encuentras una puerta cerrada. Hay algo al otro lado...";
+        }
+        return "El pasillo parece interminable... Escuchas pasos detrás de ti.";
+      }
+
+      if (gameState === 3) {
+        if (/forzar|golpear|abrir con fuerza/i.test(userMessage)) {
+          if (Math.random() < 0.5) {
+            gameState = 4;
+            return "Con un crujido siniestro, la puerta cede. Al otro lado hay un túnel...";
+          } else {
+            fearLevel += 3;
+            return "Empujas la puerta con fuerza, pero algo la bloquea desde dentro.";
+          }
         }
       }
 
       return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
     }
 
+    /* ================================
+       Funciones de Apoyo
+    ================================ */
     function addMessage(text, sender) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
       messageDiv.textContent = text;
       messagesEl.appendChild(messageDiv);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    function checkSynonyms(userMessage, synonymsArray) {
-      return synonymsArray.some(word => userMessage.toLowerCase().includes(word));
+    function checkCommand(userMessage, commandList) {
+      return commandList.some(command => userMessage.toLowerCase().includes(command));
     }
 
     function triggerEnd(text) {
