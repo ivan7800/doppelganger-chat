@@ -1,152 +1,104 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doppelgänger en Acción</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: url('https://source.unsplash.com/1920x1080/?dark,horror') no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-      font-family: 'Courier New', monospace;
-      text-align: center;
-      transition: background 1s ease-in-out, filter 0.5s;
-      overflow: hidden;
-    }
-    h1.glitch-text {
-      text-shadow: 2px 2px 5px red, -2px -2px 5px blue;
-      animation: glitch 0.1s infinite alternate;
-      margin-top: 20px;
-    }
-    @keyframes glitch {
-      0%   { transform: translate(0, 0); }
-      20%  { transform: translate(-2px, 2px); }
-      40%  { transform: translate(2px, -2px); }
-      60%  { transform: translate(-1px, 1px); }
-      80%  { transform: translate(1px, -1px); }
-      100% { transform: translate(0, 0); }
-    }
-    .chat-container {
-      max-width: 500px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.85);
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
-      position: relative;
-    }
-    .messages {
-      height: 300px;
-      overflow-y: auto;
-      border-bottom: 1px solid #ff0000;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-    }
-    .message {
-      padding: 10px;
-      border-radius: 5px;
-      margin: 5px;
-      font-size: 1rem;
-      opacity: 0;
-      animation: fadeIn 0.5s forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    .user {
-      background-color: #007bff;
-      text-align: right;
-      color: white;
-    }
-    .bot {
-      background-color: #dc3545;
-      text-align: left;
-      color: white;
-    }
-    .glitch-text {
-      text-shadow: 2px 2px 5px red, -2px -2px 5px blue;
-      animation: glitch 0.1s infinite alternate;
-    }
-    input, button {
-      padding: 8px;
-      border-radius: 5px;
-      border: 1px solid red;
-      background: black;
-      color: white;
-      font-family: inherit;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doppelgänger en Acción</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .chat-container {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #222;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        .messages {
+            height: 300px;
+            overflow-y: auto;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .message {
+            padding: 5px;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .user {
+            background-color: #007bff;
+            text-align: right;
+            color: white;
+        }
+        .bot {
+            background-color: #dc3545;
+            text-align: left;
+            color: white;
+        }
+        input {
+            width: 70%;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            padding: 8px;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <h1 class="glitch-text">Doppelgänger en Acción</h1>
-  <div class="chat-container">
-    <div class="messages" id="messages"></div>
-    <input type="text" id="userInput" placeholder="Escribe tu mensaje..." autofocus />
-    <button onclick="sendMessage()">Enviar</button>
-  </div>
 
-  <script>
-    let userName = "";
-    let messageCount = 0;
-    let possessionLevel = 0;
-    
-    function sendMessage() {
-      const input = document.getElementById("userInput");
-      const messageText = input.value.trim();
-      if (messageText === "") return;
-      addMessage(messageText, "user");
-      setTimeout(() => addMessage(generateResponse(messageText), "bot"), 500 + Math.random() * 1000);
-      input.value = "";
-    }
+    <h1>🌀 Doppelgänger en Acción</h1>
+    <div class="chat-container">
+        <div class="messages" id="messages"></div>
+        <input type="text" id="userInput" placeholder="Habla con tu sombra...">
+        <button onclick="sendMessage()">Enviar</button>
+    </div>
 
-    function generateResponse(userMessage) {
-      messageCount++;
-      possessionLevel++;
-      
-      if (!userName) {
-        userName = userMessage;
-        return `Bienvenido, ${userName}. ¿O acaso ya habías estado aquí antes?`;
-      }
-      
-      if (possessionLevel < 5) {
-        return mimicUser(userMessage);
-      } else if (possessionLevel < 10) {
-        return distortText(mimicUser(userMessage));
-      } else {
-        triggerFinale();
-        return "…";
-      }
-    }
-    
-    function mimicUser(text) {
-      return `Yo también pienso: "${text}"... curioso, ¿verdad?`;
-    }
-    
-    function distortText(text) {
-      return text.split(" ").map(word => Math.random() < 0.5 ? word.split("").reverse().join("") : word).join(" ");
-    }
+    <script>
+        const responses = [
+            "¿Salvarlo de qué… o de quién?", 
+            "¿Y si el problema real es que el mundo no quiere ser salvado?", 
+            "Tal vez este héroe sea su propio villano sin darse cuenta.",
+            "¿Cada acto heroico lo acerca a la destrucción?", 
+            "¿O acaso es solo un egoísta disfrazado de salvador?"
+        ];
 
-    function addMessage(text, sender) {
-      const messages = document.getElementById("messages");
-      const messageDiv = document.createElement("div");
-      messageDiv.classList.add("message", sender);
-      if (sender === "bot") messageDiv.classList.add("glitch-text");
-      messageDiv.textContent = text;
-      messages.appendChild(messageDiv);
-      setTimeout(() => { messages.scrollTop = messages.scrollHeight; }, 100);
-    }
+        function sendMessage() {
+            const input = document.getElementById("userInput");
+            const messageText = input.value.trim();
+            if (messageText === "") return;
 
-    function triggerFinale() {
-      document.body.style.filter = "brightness(0)";
-      setTimeout(() => {
-        document.body.innerHTML = '<h1 class="glitch-text">El Doppelgänger ha tomado el control...</h1>';
-        setTimeout(() => { location.reload(); }, 5000);
-      }, 2000);
-    }
-  </script>
+            addMessage(messageText, "user");
+
+            setTimeout(() => {
+                const botMessage = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(botMessage, "bot");
+            }, 1000);
+
+            input.value = "";
+        }
+
+        function addMessage(text, sender) {
+            const messages = document.getElementById("messages");
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", sender);
+            messageDiv.textContent = text;
+            messages.appendChild(messageDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+    </script>
+
 </body>
 </html>
