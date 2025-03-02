@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚠ DESCONEXIÓN INMINENTE</title>
+  <title>⚠️ ERROR 666</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600&display=swap');
 
     body {
       margin: 0;
       padding: 0;
-      background: black;
+      background: #0d0d0d;
       color: #e0e0e0;
       font-family: 'Space Grotesk', sans-serif;
       text-align: center;
@@ -23,7 +23,7 @@
       letter-spacing: 2px;
       text-shadow: 0 0 10px red, 0 0 15px blue;
       margin-top: 20px;
-      animation: glitch 0.5s infinite alternate, fade 3s infinite alternate;
+      animation: shadowMove 3s infinite alternate, glitch 3s infinite;
     }
 
     .chat-container {
@@ -56,14 +56,26 @@
       backdrop-filter: blur(2px);
     }
 
+    .user {
+      background-color: rgba(0, 123, 255, 0.2);
+      text-align: right;
+      color: #a9c5ff;
+      margin-left: auto;
+      border-left: 3px solid #007bff;
+    }
+
     .bot {
+      background-color: rgba(220, 53, 69, 0.2);
+      text-align: left;
       color: #ff9b9b;
-      animation: flicker 2s infinite alternate;
+      margin-right: auto;
+      border-right: 3px solid #dc3545;
+      animation: flicker 3s infinite alternate;
     }
 
     @keyframes flicker {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+      50% { opacity: 0.6; }
     }
 
     @keyframes glitch {
@@ -73,11 +85,6 @@
       60% { transform: translate(-2px, 2px); }
       80% { transform: translate(2px, -2px); }
       100% { transform: translate(0, 0); }
-    }
-
-    @keyframes fade {
-      0% { opacity: 1; }
-      100% { opacity: 0.5; }
     }
   </style>
 </head>
@@ -92,7 +99,7 @@
       <button id="sendButton">Enviar</button>
     </div>
 
-    <div class="footer">Desconexión en proceso...</div>
+    <div class="footer">Un susurro detrás de ti...</div>
   </main>
 
   <script>
@@ -101,7 +108,7 @@
     const sendButtonEl = document.getElementById("sendButton");
     const titleEl = document.getElementById("title");
 
-    let corruptionLevel = 0;
+    let glitchCounter = 0;
 
     function sendMessage() {
       const messageText = userInputEl.value.trim();
@@ -114,61 +121,38 @@
       setTimeout(() => {
         const botResponse = generateResponse(messageText);
         addMessage(botResponse, "bot");
-        increaseCorruption();
       }, 1000);
     }
 
     function generateResponse(userMessage) {
-      if (userMessage.toLowerCase().includes("desconectar")) {
-        triggerFinale();
-        return "DESCONECTANDO...";
+      if (userMessage.toLowerCase().includes("666")) {
+        triggerError666();
+        return "NO DEBISTE ESCRIBIR ESO.";
       }
 
       const horrorMessages = [
-        "No hay salida.",
+        "Las sombras se están acercando...",
         "¿Por qué sigues aquí?",
-        "Tú no escribiste ese mensaje.",
-        "El reflejo no eres tú.",
-        "Esto no es un juego.",
-        "Te he visto antes.",
-        "Tu voz suena extraña.",
-        "Hay alguien más aquí.",
-        "El código se está rompiendo..."
+        "Algo en tu reflejo no coincide...",
+        "Los susurros han aumentado...",
+        "Escucho tu respiración...",
+        "¿Qué has despertado?",
+        "No puedes salir ahora."
       ];
 
       return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
     }
 
-    function increaseCorruption() {
-      corruptionLevel++;
-      document.body.style.filter = `blur(${corruptionLevel / 5}px) contrast(${100 + corruptionLevel * 5}%)`;
-      
-      if (corruptionLevel === 10) {
-        titleEl.innerText = "⚠ RECONSTRUYENDO REALIDAD ⚠";
-        document.body.style.background = "#330033";
-      }
-      if (corruptionLevel > 15) {
-        document.body.style.transform = "rotate(1deg)";
-      }
-
-      if (corruptionLevel > 20) {
-        messagesEl.innerHTML += `<div class="message bot">Esto no debería estar pasando...</div>`;
-        setTimeout(() => triggerFinale(), 5000);
-      }
-    }
-
-    function triggerFinale() {
-      document.body.style.background = "black";
-      titleEl.innerText = "⚠ ERROR FATAL ⚠";
-      messagesEl.innerHTML = "<h2>El Doppelgänger ha escapado...</h2>";
-
+    function triggerError666() {
+      document.body.style.background = "red";
+      titleEl.innerText = "⚠ ERROR 666 ⚠";
       setInterval(() => {
         document.body.style.background = document.body.style.background === "black" ? "red" : "black";
-      }, 300);
+      }, 500);
 
       setTimeout(() => {
-        document.body.innerHTML = "<h1>☠ CONEXIÓN PERDIDA ☠</h1>";
-      }, 8000);
+        location.reload();
+      }, 5000);
     }
 
     function addMessage(text, sender) {
@@ -181,8 +165,8 @@
       if (sender === "bot") {
         setTimeout(() => {
           messageDiv.style.opacity = 0;
-          setTimeout(() => messageDiv.remove(), 3000);
-        }, Math.random() * 6000 + 2000);
+          setTimeout(() => messageDiv.remove(), 1000);
+        }, Math.random() * 5000 + 3000);
       }
     }
 
