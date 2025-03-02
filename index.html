@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Chat de terror interactivo con efecto de Doppelgänger."/>
-  <title>Doppelgänger en Acción</title>
-  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doppelgänger Mejorado</title>
   <style>
-    /* ------------------------------
-      Estilos Generales
-    ------------------------------ */
+    /* ================================
+       Estilos Generales
+    ================================ */
     body {
       margin: 0;
       padding: 0;
@@ -21,16 +19,22 @@
       transition: background 1s ease-in-out, filter 0.5s;
       overflow: hidden;
     }
-
     h1.glitch-text {
       text-shadow: 2px 2px 5px red, -2px -2px 5px blue;
       animation: glitch 0.1s infinite alternate;
       margin-top: 20px;
     }
-
-    /* ------------------------------
-      Contenedor del Chat
-    ------------------------------ */
+    @keyframes glitch {
+      0%   { transform: translate(0, 0); }
+      20%  { transform: translate(-2px, 2px); }
+      40%  { transform: translate(2px, -2px); }
+      60%  { transform: translate(-1px, 1px); }
+      80%  { transform: translate(1px, -1px); }
+      100% { transform: translate(0, 0); }
+    }
+    /* ================================
+       Contenedor del Chat
+    ================================ */
     .chat-container {
       max-width: 500px;
       margin: 20px auto;
@@ -40,7 +44,6 @@
       box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
       position: relative;
     }
-
     .messages {
       height: 300px;
       overflow-y: auto;
@@ -48,7 +51,6 @@
       padding-bottom: 10px;
       margin-bottom: 10px;
     }
-
     .message {
       padding: 10px;
       border-radius: 5px;
@@ -58,33 +60,32 @@
       animation: fadeIn 0.5s forwards;
       width: fit-content;
     }
-
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
     .user {
       background-color: #007bff;
       text-align: right;
       color: white;
       margin-left: auto;
     }
-
     .bot {
       background-color: #dc3545;
       text-align: left;
       color: white;
       margin-right: auto;
     }
-
     .glitch-text {
       text-shadow: 2px 2px 5px red, -2px -2px 5px blue;
       animation: glitch 0.1s infinite alternate;
     }
-
     .inputs {
       display: flex;
       gap: 5px;
       justify-content: center;
       margin-bottom: 5px;
     }
-
     input, button {
       padding: 8px;
       border-radius: 5px;
@@ -93,24 +94,21 @@
       color: white;
       font-family: inherit;
     }
-
     .footer {
       font-size: 0.8rem;
       margin-top: 10px;
       opacity: 0.8;
     }
-
-    /* ------------------------------
-      Efecto de Pantalla Oscura
-    ------------------------------ */
+    /* ================================
+       Efecto de Pantalla Oscura
+    ================================ */
     .dark-flash {
       filter: brightness(0);
       transition: filter 0.3s;
     }
-
-    /* ------------------------------
-      Presencia Fantasmal
-    ------------------------------ */
+    /* ================================
+       Presencia Fantasmal
+    ================================ */
     .presence {
       position: fixed;
       top: 50%;
@@ -123,126 +121,109 @@
       transition: opacity 0.3s;
       transform: translate(-50%, -50%);
     }
-
-    /* ------------------------------
-      Animaciones Clave
-    ------------------------------ */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes glitch {
-      0%   { transform: translate(0, 0); }
-      20%  { transform: translate(-2px, 2px); }
-      40%  { transform: translate(2px, -2px); }
-      60%  { transform: translate(-1px, 1px); }
-      80%  { transform: translate(1px, 0); }
-      100% { transform: translate(0, 0); }
-    }
-    @keyframes flicker {
-      0%   { opacity: 1; }
-      50%  { opacity: 0.2; }
-      100% { opacity: 1; }
-    }
-
-    /* ------------------------------
-      Responsividad
-    ------------------------------ */
-    @media (max-width: 550px) {
-      .chat-container {
-        width: 90%;
-        padding: 10px;
-      }
-      .messages {
-        height: 250px;
-      }
-    }
   </style>
 </head>
 <body>
-  <h1 class="glitch-text">🌀 Doppelgänger en Acción</h1>
+  <h1 class="glitch-text">Doppelgänger Mejorado</h1>
 
   <main role="main" class="chat-container">
+    <!-- Área de mensajes -->
     <div class="messages" id="messages" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Entrada de texto y botón de envío -->
     <div class="inputs">
       <input 
         type="text" 
         id="userInput" 
-        placeholder="Dime tu nombre..." 
+        placeholder="Escribe tu mensaje..." 
         autocomplete="off" 
         aria-label="Introduce tu mensaje" />
       <button id="sendButton">Enviar</button>
     </div>
-    <div class="footer">Chatbot creado por I. Roig</div>
+
+    <div class="footer">Chat extendido con mejoras</div>
   </main>
 
+  <!-- Presencia fantasmal -->
   <div class="presence" id="presence" aria-hidden="true"></div>
 
   <script>
-    /* -----------------------------------------
-       Variables y Constantes
-    ----------------------------------------- */
+    /* =====================================
+       Variables globales y Configuración
+    ===================================== */
     const messagesEl = document.getElementById("messages");
     const userInputEl = document.getElementById("userInput");
     const sendButtonEl = document.getElementById("sendButton");
     const presenceEl = document.getElementById("presence");
 
-    // Ajusta el número de mensajes antes del "final" a tu gusto.
-    const MAX_MESSAGES = 15;
+    const MAX_MESSAGES = 20; // Límite de mensajes para “final terrorífico” genérico
     let messageCount = 0;
-    let userName = "";
 
-    // Mensajes que mostrará el bot aleatoriamente
+    // Estados de juego:
+    // 0 => usuario no ha introducido nombre
+    // 1 => intro completa, sala con espejo
+    // 2 => pasillo
+    // 3 => puerta cerrada
+    // 4 => acceso a final “bueno” (si se cumplen condiciones)
+    // 99 => placeholder (se podría usar para más escenas)
+    let gameState = 0;
+    let userName = "";
+    let fearLevel = 0; // Subirá con ciertos eventos y la inactividad
+    let inventory = {
+      flashlight: false, // linterna
+    };
+
+    // Sinónimos para entender más entradas:
+    // El bot buscará en estos arrays para determinar qué acción realiza el usuario.
+    const synonyms = {
+      mirror: ["mirar espejo","examinar espejo","observar espejo","ver espejo"],
+      light: ["encender luz","prender luz","buscar interruptor","prender foco"],
+      back:  ["retroceder","volver atras","volver atrás","ir atrás","ir atras"],
+      help:  ["ayuda","auxilio","socorro","ayudame","ayúdame"],
+      pickUpFlashlight: ["coger linterna","tomar linterna","agarrar linterna","recoger linterna"],
+      door:  ["abrir puerta","examinar puerta","mirar puerta","tocar puerta"]
+    };
+
+    // Mensajes genéricos de horror
     const surpriseMessages = [
-      "El reflejo a veces se queda... incluso cuando el original desaparece.",
-      "¿Puedes sentirlo? Algo está observándote a través de la pantalla.",
-      "Escuché un eco de tu voz... pero no fuiste tú quien habló.",
-      "Si te quedas en silencio demasiado tiempo, las sombras se acercan.",
-      "Doppelgänger... siempre esperando su momento.",
-      "Los espejos no reflejan todo lo que deberían...",
-      "Cada vez que parpadeas, algo cambia ligeramente.",
-      "Deja de escribir. Ya es demasiado tarde.",
-      "A veces, el reflejo parpadea... pero tú no.",
-      "Hay un susurro detrás de ti que imita tu voz.",
-      "Cuando miras a un espejo, él también te está mirando.",
-      "¿Notaste el frío repentino? No estabas solo.",
-      "Los sueños a veces revelan más que la realidad.",
-      "Cierra los ojos. Verás que la oscuridad no está vacía.",
-      "Los pasos detrás de ti se detienen cuando tú también te detienes.",
-      "El espejo sonríe cuando tú no lo haces.",
-      "La sensación de que te tocan el hombro... aunque estés solo.",
-      "Nadie está a salvo de su propio reflejo.",
-      "Una sombra extra cruza la habitación, pero no es la tuya.",
-      "Cada reflejo cuenta una historia distinta, ¿cuál es la tuya?"
+      "Las sombras se mueven sin tu permiso.",
+      "Un eco distante repite tu nombre.",
+      "Sientes un escalofrío que recorre tu espalda...",
+      "Hay un reflejo que parpadea sin que tú lo hagas.",
+      "El tiempo se distorsiona en la penumbra.",
+      "Un susurro muy cerca de tu oído... ¿lo escuchaste?"
     ];
 
-    /* -----------------------------------------
-       Eventos
-    ----------------------------------------- */
-    // Enviar al hacer click en el botón
-    sendButtonEl.addEventListener("click", sendMessage);
+    // Timer para inactividad
+    let inactivityTimer;
+    const INACTIVITY_LIMIT = 15_000; // 15 segundos
 
-    // Enviar al presionar Enter en el input
+    /* =============================
+       Listeners principales
+    ============================= */
+    sendButtonEl.addEventListener("click", sendMessage);
     userInputEl.addEventListener("keydown", function(event) {
       if (event.key === "Enter") {
         sendMessage();
       }
     });
 
-    /* -----------------------------------------
+    // Cada vez que el usuario interactúe, reseteamos el temporizador
+    document.addEventListener("click", resetInactivityTimer);
+    document.addEventListener("keydown", resetInactivityTimer);
+
+    startInactivityTimer();
+
+    /* =============================
        Funciones Principales
-    ----------------------------------------- */
+    ============================= */
     function sendMessage() {
       const messageText = userInputEl.value.trim();
       if (messageText === "") return;
 
-      // Agrega el mensaje del usuario
       addMessage(messageText, "user");
-
-      // Limpia el input
       userInputEl.value = "";
 
-      // Respuesta del bot con un ligero retardo
       setTimeout(() => {
         const botResponse = generateResponse(messageText);
         addMessage(botResponse, "bot");
@@ -250,48 +231,143 @@
     }
 
     function generateResponse(userMessage) {
-      // Primer mensaje: el bot guarda el nombre y responde
-      if (!userName) {
-        userName = userMessage;
-        messageCount++;
-        return `Bienvenido, ${userName}. ¿O acaso ya habías estado aquí antes?`;
-      }
+      messageCount++;
 
-      // A partir de cierto número de mensajes, desencadena el final
-      if (messageCount > MAX_MESSAGES) {
-        triggerFinale();
+      // Chequeo: si fearLevel es muy alto, dispara final antes de llegar a MAX_MESSAGES
+      if (fearLevel >= 10) {
+        triggerDoppelgangerAttack("El temor te consume por completo... Tu Doppelgänger toma posesión de tu cuerpo.");
         return "…";
       }
 
-      // Muestra un mensaje aleatorio
-      const randomIndex = Math.floor(Math.random() * surpriseMessages.length);
-      let response = surpriseMessages[randomIndex];
-
-      // Con cierta probabilidad, invierte el texto parcial
-      if (Math.random() < 0.3) {
-        response = flipText(response);
+      // Primer estado: usuario no ha dado su nombre
+      if (gameState === 0) {
+        userName = userMessage;
+        gameState = 1;
+        return `Bienvenido, ${userName}. Una sombra familiar te observa en este lugar oscuro...`;
       }
 
-      messageCount++;
-      return response;
+      // Segundo estado: sala con espejo (gameState = 1)
+      if (gameState === 1) {
+        // Transición a pasillo si el usuario “retrocede” o si insiste en explorar más
+        // Revisamos acciones usando la función checkSynonyms()
+        if (checkSynonyms(userMessage, synonyms.mirror)) {
+          fearLevel += 2;
+          return "Te acercas al espejo... Tu reflejo parpadea con vida propia. (Temor: " + fearLevel + ")";
+        } 
+        else if (checkSynonyms(userMessage, synonyms.light)) {
+          // Podrías encontrar la linterna
+          inventory.flashlight = true;
+          return "Buscas un interruptor y encuentras una linterna vieja. Ahora la tienes en tu inventario. (Temor: " + fearLevel + ")";
+        } 
+        else if (checkSynonyms(userMessage, synonyms.pickUpFlashlight)) {
+          inventory.flashlight = true;
+          return "Recoges la linterna. Notas que aún funciona aunque la luz es tenue. (Temor: " + fearLevel + ")";
+        }
+        else if (checkSynonyms(userMessage, synonyms.back)) {
+          // Avanzamos al pasillo (gameState = 2)
+          gameState = 2;
+          return "Te alejas del espejo y sales al pasillo principal. Se escucha un susurro al fondo.";
+        } 
+        else {
+          // Por defecto, un mensaje tenebroso
+          return randomHorrorResponse();
+        }
+      }
+
+      // Tercer estado: pasillo (gameState = 2)
+      if (gameState === 2) {
+        if (checkSynonyms(userMessage, synonyms.door)) {
+          // Avanzamos al gameState 3
+          gameState = 3;
+          return "Te acercas a una puerta vieja y desgastada. Está cerrada, pero escuchas algo al otro lado...";
+        } 
+        else if (checkSynonyms(userMessage, synonyms.mirror)) {
+          fearLevel++;
+          return "No hay espejos aquí, pero sientes que algo te observa desde la oscuridad. (Temor: " + fearLevel + ")";
+        }
+        else if (inventory.flashlight && checkSynonyms(userMessage, synonyms.light)) {
+          return "Enciendes la linterna. El haz de luz revela paredes llenas de marcas de garras. (Temor: " + fearLevel + ")";
+        } 
+        else {
+          return randomHorrorResponse();
+        }
+      }
+
+      // Cuarto estado: puerta cerrada (gameState = 3)
+      if (gameState === 3) {
+        if (/forzar|golpear|abrir con fuerza/i.test(userMessage)) {
+          // Pequeña probabilidad de abrir la puerta
+          if (Math.random() < 0.5) {
+            // Éxito: pasa al gameState 4 (posible final “bueno”)
+            gameState = 4;
+            return "Con un crujido siniestro, la puerta cede. Al otro lado, ves un pasaje que conduce a la salida...";
+          } else {
+            fearLevel += 3;
+            return "Empujas con fuerza, pero la puerta se resiste. Cruje de forma amenazante. (Temor: " + fearLevel + ")";
+          }
+        } 
+        else if (/escuchar|oír|oigo/i.test(userMessage)) {
+          fearLevel++;
+          return "Pegas el oído a la puerta... se oyen rasguños y una respiración entrecortada. (Temor: " + fearLevel + ")";
+        }
+        else if (checkSynonyms(userMessage, synonyms.back)) {
+          // Regresa al pasillo
+          gameState = 2;
+          return "Regresas al pasillo, dejando la puerta atrás... (Temor: " + fearLevel + ")";
+        }
+        else {
+          return randomHorrorResponse();
+        }
+      }
+
+      // Quinto estado: acceso a final “bueno” (gameState = 4)
+      if (gameState === 4) {
+        // Ejemplo de final alternativo si tienes la linterna:
+        if (inventory.flashlight) {
+          // Final de escape
+          triggerGoodEnding("Encuentras un túnel iluminado por tu linterna... Logras escapar mientras el reflejo desaparece.");
+          return "…";
+        } else {
+          // Final “malo” si no tienes linterna
+          triggerDoppelgangerAttack("Sin luz, te adentras en la penumbra... Tu propio eco te responde, y la oscuridad te atrapa.");
+          return "…";
+        }
+      }
+
+      // Si supera el número máximo de mensajes, también dispara un final
+      if (messageCount > MAX_MESSAGES) {
+        triggerDoppelgangerAttack("El número de susurros supera toda lógica. El Doppelgänger toma el control total...");
+        return "…";
+      }
+
+      // Por si hay otros estados que no hemos cubierto (ej. gameState > 4):
+      return randomHorrorResponse();
     }
 
+    /* =============================
+       Funciones de Apoyo
+    ============================= */
     function addMessage(text, sender) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
-
-      // Agrega clase de glitch si es el bot
       if (sender === "bot") {
         messageDiv.classList.add("glitch-text");
       }
-
       messageDiv.textContent = text;
       messagesEl.appendChild(messageDiv);
-      
-      // Forzar scroll al final
       setTimeout(() => {
         messagesEl.scrollTop = messagesEl.scrollHeight;
       }, 100);
+    }
+
+    function randomHorrorResponse() {
+      const randomIndex = Math.floor(Math.random() * surpriseMessages.length);
+      let response = surpriseMessages[randomIndex];
+      // Con cierta probabilidad, invierte parcialmente
+      if (Math.random() < 0.3) {
+        response = flipText(response);
+      }
+      return response + " (Temor: " + fearLevel + ")";
     }
 
     function flipText(text) {
@@ -301,27 +377,62 @@
         .join(" ");
     }
 
-    /* -----------------------------------------
-       Efecto Final
-    ----------------------------------------- */
-    function triggerFinale() {
-      // Pantalla se oscurece
+    // Checa si userMessage coincide con alguno de los sinónimos en el array
+    function checkSynonyms(userMessage, synonymsArray) {
+      userMessage = userMessage.toLowerCase();
+      for (let i = 0; i < synonymsArray.length; i++) {
+        if (userMessage.includes(synonymsArray[i])) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Temporizador de inactividad: si pasa X tiempo sin interacción, sube fearLevel
+    function startInactivityTimer() {
+      inactivityTimer = setTimeout(() => {
+        fearLevel += 2; // penaliza inactividad
+        addMessage("El silencio prolongado intensifica tu ansiedad... (Temor: " + fearLevel + ")", "bot");
+      }, INACTIVITY_LIMIT);
+    }
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      startInactivityTimer();
+    }
+
+    // Final “malo” forzado por Doppelgänger
+    function triggerDoppelgangerAttack(text) {
+      // Oscurecer pantalla
       document.body.classList.add("dark-flash");
-
-      // Aparece la presencia fantasmal
       presenceEl.style.opacity = "1";
-
-      // Cambia el título
-      document.title = "Error 404 - Doppelgänger Control";
+      document.title = "ERROR: Doppelgänger Suelto";
 
       setTimeout(() => {
-        // Reemplaza todo el contenido con mensaje de control
-        document.body.innerHTML = '<h1 class="glitch-text" style="margin-top:20px;">El Doppelgänger ha tomado el control...</h1>';
-        
-        // Recarga después de 5 segundos
-        setTimeout(() => {
-          location.reload();
-        }, 5000);
+        document.body.innerHTML = `
+          <h1 class="glitch-text" style="margin-top:20px;">
+            ${text}<br><br>
+            ¡El Doppelgänger te ha consumido!
+          </h1>
+        `;
+        setTimeout(() => location.reload(), 5000);
+      }, 2000);
+    }
+
+    // Final “bueno” (escape)
+    function triggerGoodEnding(text) {
+      document.body.classList.add("dark-flash");
+      presenceEl.style.opacity = "1";
+      document.title = "Esperanza al Final";
+
+      setTimeout(() => {
+        document.body.innerHTML = `
+          <h1 class="glitch-text" style="margin-top:20px;">
+            ${text}<br><br>
+            ¡Escapas de tu propio reflejo!
+          </h1>
+        `;
+        setTimeout(() => location.reload(), 5000);
       }, 2000);
     }
   </script>
