@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doppelgänger en Acción</title>
+    <title>🌀 Tu Doppelgänger en Acción</title>
     <style>
         body {
             background-color: #111;
@@ -12,55 +12,6 @@
             text-align: center;
             overflow: hidden;
         }
-        .portada {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            background-color: black;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            z-index: 10;
-            transition: opacity 1s ease-in-out;
-        }
-        .portada h1 {
-            font-size: 3rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-        }
-        .portada input {
-            padding: 12px;
-            font-size: 1rem;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-            background-color: #222;
-            color: white;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        .portada input:focus {
-            background-color: #333;
-            transform: scale(1.05);
-        }
-        .portada button {
-            padding: 15px 30px;
-            font-size: 1.3rem;
-            border: none;
-            border-radius: 5px;
-            background-color: #dc3545;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-        .portada button:hover {
-            background-color: #c82333;
-            transform: scale(1.1);
-        }
         .chat-container {
             max-width: 500px;
             margin: 20px auto;
@@ -68,7 +19,7 @@
             background-color: #222;
             border-radius: 10px;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-            opacity: 0;
+            opacity: 1;
             transition: opacity 1s ease-in-out;
             max-height: 80vh;
             overflow-y: auto;
@@ -113,10 +64,6 @@
             transition: all 0.3s;
             font-size: 1rem;
         }
-        input:focus {
-            border-color: #007bff;
-            background-color: #444;
-        }
         button {
             padding: 12px 18px;
             border-radius: 5px;
@@ -128,97 +75,62 @@
             font-weight: bold;
             transition: background-color 0.3s, transform 0.2s;
         }
-        button:hover {
-            background-color: #218838;
-            transform: scale(1.05);
-        }
-        .clear-button {
-            background-color: #dc3545;
-            margin-left: 10px;
-        }
-        .clear-button:hover {
-            background-color: #c82333;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
     </style>
 </head>
 <body>
-    <div class="portada" id="portada">
-        <h1>🌀 Doppelgänger en Acción</h1>
-        <p>Chatbot creado por <strong>I. Roig</strong></p>
-        <input type="text" id="nombreUsuario" placeholder="Escribe tu nombre...">
-        <button onclick="iniciarChat()">Entrar</button>
-    </div>
-    
     <div class="chat-container" id="chat-container">
-        <h2 id="saludo"></h2>
+        <h2 id="saludo">Tu sombra te espera...</h2>
         <div class="messages" id="messages"></div>
-        <input type="text" id="userInput" placeholder="Habla con tu sombra..." onkeypress="handleKeyPress(event)" disabled>
-        <button onclick="sendMessage()" disabled>Enviar</button>
-        <button onclick="clearChat()" class="clear-button" disabled>Borrar Chat</button>
-        <button onclick="cambiarUsuario()" class="clear-button">Cambiar Usuario</button>
+        <input type="text" id="userInput" placeholder="Habla con tu Doppelgänger..." onkeydown="if(event.key === 'Enter') sendMessage()">
+        <button onclick="sendMessage()">Enviar</button>
     </div>
 
     <script>
-        function iniciarChat() {
-            let nombreUsuario = document.getElementById("nombreUsuario").value.trim();
-            if (nombreUsuario === "") {
-                alert("Por favor, escribe tu nombre para continuar.");
-                return;
-            }
-            localStorage.setItem("nombreUsuario", nombreUsuario);
-            document.getElementById("portada").style.opacity = "0";
-            setTimeout(() => {
-                document.getElementById("portada").style.display = "none";
-                document.getElementById("chat-container").style.opacity = "1";
-                document.getElementById("saludo").textContent = `Bienvenido, ${nombreUsuario}`;
-                habilitarChat();
-                cargarMensajes();
-            }, 1000);
-        }
-
-        function habilitarChat() {
-            document.getElementById("userInput").disabled = false;
-            document.querySelectorAll("button").forEach(btn => btn.disabled = false);
-            document.getElementById("userInput").focus();
-        }
-
         function sendMessage() {
             let input = document.getElementById("userInput");
             let message = input.value.trim();
-            if (message === "") return;
+            if (!message) return;
 
             let chatBox = document.getElementById("messages");
+            chatBox.innerHTML += `<div class="message user">${message}</div>`;
 
-            let userMessage = document.createElement("div");
-            userMessage.classList.add("message", "user");
-            userMessage.textContent = message;
-            chatBox.appendChild(userMessage);
-
-            let botResponse = document.createElement("div");
-            botResponse.classList.add("message", "bot");
-            botResponse.textContent = generarRespuesta(message);
-            chatBox.appendChild(botResponse);
+            let botResponse = generarRespuesta(message);
+            chatBox.innerHTML += `<div class="message bot">${botResponse}</div>`;
 
             input.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
-            guardarMensajes();
         }
 
         function generarRespuesta(input) {
-            let respuestas = ["Interesante...", "Cuéntame más...", "Eso suena misterioso.", "¿Qué más tienes en mente?"];
-            return respuestas[Math.floor(Math.random() * respuestas.length)];
-        }
+            input = input.toLowerCase();
 
-        function guardarMensajes() {
-            localStorage.setItem("chat", document.getElementById("messages").innerHTML);
-        }
+            const respuestasGenerales = [
+                "¿Y si todo lo que crees es una mentira conveniente?",
+                "¿Te atreverías a ver la versión más oscura de ti mismo?",
+                "Si realmente supieras la verdad, ¿seguirías adelante o te detendrías?",
+                "¿Qué pasaría si tu mejor idea fuera en realidad tu peor error?",
+                "No soy tu enemigo, pero tampoco soy tu amigo. ¿Te atreves a escucharme?",
+                "Cada decisión que tomas tiene un precio oculto. ¿Estás dispuesto a pagarlo?"
+            ];
 
-        function cargarMensajes() {
-            document.getElementById("messages").innerHTML = localStorage.getItem("chat") || "";
+            const respuestasPorPalabrasClave = {
+                "hola": ["¿Seguro que eres tú quien me habla... o soy yo quien habla contigo?", "Un simple saludo... pero ¿es realmente tan simple?"],
+                "nombre": ["Los nombres son máscaras. ¿Cuál es la tuya realmente?", "¿Acaso importa cómo te llamas si no eres quien crees ser?"],
+                "quién eres": ["Soy el eco de lo que ignoras. ¿Quieres escucharme o seguir huyendo?", "Soy lo que serías si abandonaras tus miedos."],
+                "dónde estás": ["Justo detrás de tus pensamientos más oscuros.", "Siempre a tu lado, esperando que abras los ojos."],
+                "ayuda": ["¿Quieres ayuda… o solo confirmación de lo que ya sabes?", "No puedes escapar de ti mismo. ¿Por qué intentarlo?"],
+                "miedo": ["El miedo solo es real si le das poder. ¿Y si lo desafiaras?", "Si temes a la oscuridad, es porque aún no te has convertido en ella."],
+                "decisión": ["Cada decisión que tomas cierra una puerta. ¿Sabes cuál dejaste atrás?", "Elegir no es más que renunciar. ¿Estás seguro de haber renunciado a lo correcto?"],
+                "sombra": ["Tu sombra sabe más de ti que tú mismo. ¿Te atreves a preguntarle?", "No puedes deshacerte de mí. Soy parte de ti."]
+            };
+
+            for (let palabra in respuestasPorPalabrasClave) {
+                if (input.includes(palabra)) {
+                    return respuestasPorPalabrasClave[palabra][Math.floor(Math.random() * respuestasPorPalabrasClave[palabra].length)];
+                }
+            }
+
+            return respuestasGenerales[Math.floor(Math.random() * respuestasGenerales.length)];
         }
     </script>
 </body>
