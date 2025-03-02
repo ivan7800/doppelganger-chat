@@ -8,8 +8,58 @@
         body {
             background-color: #111;
             color: white;
-            font-family: Arial, sans-serif;
+            font-family: 'Georgia', serif;
             text-align: center;
+            overflow: hidden;
+        }
+        .portada {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 10;
+            transition: opacity 1s ease-in-out;
+        }
+        .portada h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        .portada input {
+            padding: 12px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #222;
+            color: white;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .portada input:focus {
+            background-color: #333;
+            transform: scale(1.05);
+        }
+        .portada button {
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .portada button:hover {
+            background-color: #c82333;
+            transform: scale(1.1);
         }
         .chat-container {
             max-width: 500px;
@@ -17,7 +67,11 @@
             padding: 20px;
             background-color: #222;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            max-height: 80vh;
+            overflow-y: auto;
         }
         .messages {
             height: 300px;
@@ -26,11 +80,12 @@
             padding-bottom: 10px;
             margin-bottom: 10px;
             text-align: left;
+            font-size: 1.1rem;
         }
         .message {
-            padding: 8px;
-            border-radius: 5px;
-            margin: 5px;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 6px;
             max-width: 80%;
             word-wrap: break-word;
             animation: fadeIn 0.3s ease-in-out;
@@ -49,25 +104,27 @@
         }
         input {
             width: 70%;
-            padding: 10px;
+            padding: 12px;
             border-radius: 5px;
             border: 1px solid #555;
             background-color: #333;
             color: white;
             outline: none;
             transition: all 0.3s;
+            font-size: 1rem;
         }
         input:focus {
             border-color: #007bff;
             background-color: #444;
         }
         button {
-            padding: 10px 15px;
+            padding: 12px 18px;
             border-radius: 5px;
             background-color: #28a745;
             color: white;
             border: none;
             cursor: pointer;
+            font-size: 1rem;
             font-weight: bold;
             transition: background-color 0.3s, transform 0.2s;
         }
@@ -89,73 +146,68 @@
     </style>
 </head>
 <body>
-    <h1>🌀 Doppelgänger en Acción</h1>
-    <div class="chat-container">
+    <div class="portada" id="portada">
+        <h1>🌀 Doppelgänger en Acción</h1>
+        <p>Chatbot creado por <strong>I. Roig</strong></p>
+        <input type="text" id="nombreUsuario" placeholder="Escribe tu nombre...">
+        <button onclick="iniciarChat()">Entrar</button>
+    </div>
+    
+    <div class="chat-container" id="chat-container">
+        <h2 id="saludo"></h2>
         <div class="messages" id="messages"></div>
         <input type="text" id="userInput" placeholder="Habla con tu sombra..." onkeypress="handleKeyPress(event)" disabled>
         <button onclick="sendMessage()" disabled>Enviar</button>
         <button onclick="clearChat()" class="clear-button" disabled>Borrar Chat</button>
+        <button onclick="cambiarUsuario()" class="clear-button">Cambiar Usuario</button>
     </div>
 
     <script>
-        let memory = [];
-        const maxMessages = 50;
-        
-        const responses = {
-            "hola": ["Hola, viajero del abismo...", "¿Eres real o solo un eco en la niebla?", "Saludos, sombra errante."],
-            "quién eres": ["Soy tu reflejo en la penumbra.", "Alguien que susurra desde el otro lado."],
-            "default": ["No estoy seguro de entender... pero eso me inquieta.", "Habla más. Tal vez encuentre el patrón en tus palabras."]
-        };
-
-        function scrollToBottom() {
-            const messages = document.getElementById("messages");
-            messages.scrollTop = messages.scrollHeight;
-        }
-
-        function sendMessage() {
-            const input = document.getElementById("userInput");
-            const sendButton = document.querySelector("button:not(.clear-button)");
-            const clearButton = document.querySelector(".clear-button");
-            const messageText = input.value.trim();
-
-            if (messageText === "") return;
-
-            addMessage(messageText, "user");
-            input.value = "";
-            input.disabled = true;
-            sendButton.disabled = true;
-            clearButton.disabled = true;
-
-            const messages = document.getElementById("messages");
-            const typingDiv = document.createElement("div");
-            typingDiv.classList.add("message", "bot");
-            typingDiv.textContent = "Escribiendo...";
-            messages.appendChild(typingDiv);
-            scrollToBottom();
-
+        function iniciarChat() {
+            let nombreUsuario = document.getElementById("nombreUsuario").value.trim();
+            if (nombreUsuario === "") {
+                alert("Por favor, escribe tu nombre para continuar.");
+                return;
+            }
+            localStorage.setItem("nombreUsuario", nombreUsuario);
+            document.getElementById("portada").style.opacity = "0";
             setTimeout(() => {
-                messages.removeChild(typingDiv);
-                const botMessage = generateResponse(messageText);
-                addMessage(botMessage, "bot");
-                input.disabled = false;
-                sendButton.disabled = false;
-                clearButton.disabled = false;
-                input.focus();
+                document.getElementById("portada").style.display = "none";
+                document.getElementById("chat-container").style.opacity = "1";
+                document.getElementById("saludo").textContent = `Bienvenido, ${nombreUsuario}`;
+                habilitarChat();
             }, 1000);
         }
 
-        function clearChat() {
-            localStorage.removeItem('doppelgangerChat');
-            document.getElementById("messages").innerHTML = '';
-            memory = [];
+        function habilitarChat() {
+            document.getElementById("userInput").disabled = false;
+            document.querySelectorAll("button").forEach(btn => btn.disabled = false);
             document.getElementById("userInput").focus();
         }
 
+        function sendMessage() {
+            let input = document.getElementById("userInput");
+            let message = input.value.trim();
+            if (message === "") return;
+            // Lógica para enviar mensaje aquí...
+        }
+
+        function cambiarUsuario() {
+            document.getElementById("chat-container").style.opacity = "0";
+            setTimeout(() => {
+                localStorage.removeItem("nombreUsuario");
+                location.reload();
+            }, 500);
+        }
+
         window.onload = function() {
-            loadMessagesFromStorage();
-            document.getElementById("userInput").disabled = false;
-            document.querySelector("button:not(.clear-button)").disabled = false;
-            document.querySelector(".clear-button").disabled = false;
+            let nombreGuardado = localStorage.getItem("nombreUsuario");
+            if (nombreGuardado) {
+                document.getElementById("portada").style.display = "none";
+                document.getElementById("chat-container").style.opacity = "1";
+                document.getElementById("saludo").textContent = `Bienvenido de nuevo, ${nombreGuardado}`;
+                habilitarChat();
+            }
         };
     </script>
 </body>
