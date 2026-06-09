@@ -229,6 +229,24 @@
       color:var(--p); text-shadow:0 0 6px var(--p);
       transition: color .5s, text-shadow .5s;
     }
+    #musicBtn {
+      background: transparent;
+      border: 1px solid rgba(0,255,65,.28);
+      color: rgba(0,255,65,.62);
+      font-family: var(--font-mono);
+      font-size: clamp(.52rem,1.4vw,.66rem);
+      padding: 4px 7px;
+      cursor: pointer;
+      letter-spacing: .04em;
+      -webkit-appearance: none;
+      border-radius: 0;
+    }
+    #musicBtn.on {
+      color: var(--g);
+      border-color: rgba(0,255,65,.55);
+      box-shadow: 0 0 10px rgba(0,255,65,.14);
+    }
+    #musicBtn:hover { background: rgba(0,255,65,.06); }
 
     /* ── MESSAGES ── */
     .messages {
@@ -436,6 +454,7 @@
         <div class="dot dot-g"></div>
         <span class="h-label">TERMINAL // MOTOR_LOCAL</span>
         <span id="phaseLabel">FASE I</span>
+        <button id="musicBtn" class="on" type="button" aria-label="Activar o desactivar música">MÚSICA ON</button>
       </div>
 
       <div class="messages" id="messages">
@@ -615,16 +634,21 @@ loadPersistentState();
 /* ════════════════════════════════════════════════
    WEB AUDIO ENGINE
 ════════════════════════════════════════════════ */
-let AC = null, masterGain = null, drones = [];
+let AC = null, masterGain = null, drones = [], musicTimer = null;
+let musicOn = true;
 
 function initAudio() {
-  if (AC) return;
+  if (AC) {
+    if (AC.state === 'suspended') AC.resume();
+    return;
+  }
   AC = new (window.AudioContext || window.webkitAudioContext)();
   masterGain = AC.createGain();
   masterGain.gain.setValueAtTime(0, AC.currentTime);
-  masterGain.gain.linearRampToValueAtTime(0.16, AC.currentTime + 3);
+  masterGain.gain.linearRampToValueAtTime(musicOn ? 0.18 : 0, AC.currentTime + 3);
   masterGain.connect(AC.destination);
   buildDrones();
+  startMusicLoop();
 }
 
 function buildDrones() {
@@ -653,6 +677,73 @@ function updateDronePhase(ph) {
   const vol  = .16 + (ph-1)*.05;
   masterGain.gain.linearRampToValueAtTime(vol, AC.currentTime+2);
   drones.forEach((d,i) => d.osc.frequency.linearRampToValueAtTime(base*(i+1)*(1+(ph-1)*.03), AC.currentTime+3));
+}
+
+function startMusicLoop() {
+  if (!AC || musicTimer) return;
+  musicTimer = setInterval(() => {
+    if (!musicOn || S.done) return;
+    playAmbientChord();
+    if (Math.random() < 0.35 + S.phase * 0.07) playDistantBell();
+  }, 5200);
+}
+
+function setMusicEnabled(on) {
+  musicOn = on;
+  const btn = document.getElementById('musicBtn');
+  if (btn) {
+    btn.textContent = on ? 'MÚSICA ON' : 'MÚSICA OFF';
+    btn.classList.toggle('on', on);
+  }
+  if (!AC) return;
+  if (AC.state === 'suspended') AC.resume();
+  masterGain.gain.cancelScheduledValues(AC.currentTime);
+  masterGain.gain.linearRampToValueAtTime(on ? 0.18 + (S.phase-1)*0.035 : 0, AC.currentTime + 0.8);
+}
+
+function playAmbientChord() {
+  if (!AC || !musicOn) return;
+  const roots = [36, 40, 43, 31];
+  const root = roots[S.phase-1] || 36;
+  const intervals = Math.random() > 0.5 ? [0, 7, 12, 19] : [0, 5, 11, 17];
+  intervals.forEach((semi, i) => {
+    const freq = root * Math.pow(2, semi/12);
+    const o = AC.createOscillator();
+    const g = AC.createGain();
+    const f = AC.createBiquadFilter();
+    o.type = i % 2 ? 'triangle' : 'sine';
+    o.frequency.setValueAtTime(freq, AC.currentTime);
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(260 + S.phase * 80, AC.currentTime);
+    f.Q.value = 0.8;
+    const now = AC.currentTime;
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.linearRampToValueAtTime(0.018 + S.phase * 0.004, now + 1.4);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 7.5 + Math.random()*2);
+    o.connect(f); f.connect(g); g.connect(masterGain);
+    o.start(now);
+    o.stop(now + 9.5);
+  });
+}
+
+function playDistantBell() {
+  if (!AC || !musicOn) return;
+  const notes = [220, 246.94, 261.63, 329.63, 392, 440];
+  const base = notes[Math.floor(Math.random()*notes.length)] / (S.phase >= 3 ? 1 : 2);
+  const o = AC.createOscillator();
+  const g = AC.createGain();
+  const delay = AC.createDelay();
+  const feedback = AC.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(base, AC.currentTime);
+  delay.delayTime.value = 0.42 + Math.random()*0.25;
+  feedback.gain.value = 0.22;
+  const now = AC.currentTime;
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.linearRampToValueAtTime(0.035, now + 0.04);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 2.8);
+  o.connect(g); g.connect(masterGain); g.connect(delay); delay.connect(feedback); feedback.connect(delay); delay.connect(masterGain);
+  o.start(now); o.stop(now + 3);
 }
 
 function playNote(freq, type, dur, vol) {
@@ -736,7 +827,7 @@ function triggerGlitch(n=2) {
    WHISPERS
 ════════════════════════════════════════════════ */
 const WL = document.getElementById('whisperLayer');
-const WHISPERS = ['...dos','¿quién escribe?','reflejo','Vezreth','no estás solo','...te veo','el espejo miente','666','ya no recuerdas','¿cuándo llegaste?','nosotros','el otro tú','convergencia','...aquí','prohibido','¿lo sentiste?','Vez...'];
+const WHISPERS = ['...dos','¿quién escribe?','reflejo','Vezreth','no estás solo','...te veo','el espejo miente','666','ya no recuerdas','¿cuándo llegaste?','nosotros','el otro tú','convergencia','...aquí','prohibido','¿lo sentiste?','Vez...','PUERTA 404','REFLEJO 404','SANTA BRUNA','OMEGA','NOMBRE DEVORADO','LA CASA DEL ÁNGEL DORMIDO'];
 function spawnWhisper() {
   if(S.ritual<12) return;
   const w=document.createElement('div'); w.className='whisper';
@@ -888,8 +979,45 @@ const API_PROXY_URL = ''; // Ejemplo futuro: 'https://tu-dominio.com/api/doppelg
 
 const LOCAL_MEMORY = {
   lastTopics: [],
-  userQuestions: 0
+  userQuestions: 0,
+  titleEchoes: 0
 };
+
+const UNIVERSE_404_ECHOES = [
+  { key:'puerta', title:'PUERTA 404', line:'Hay una puerta que no se abre: devuelve versiones incompletas de quien llama.' },
+  { key:'reflejo', title:'REFLEJO 404', line:'El reflejo no se ha roto. Solo ha aprendido a contestar antes.' },
+  { key:'mono', title:'LOS HIJOS DEL MONO', line:'En algún lugar, los hijos del mono todavía escuchan una cinta que no debió rebobinarse.' },
+  { key:'bruna', title:'SANTA BRUNA DE LA CARNE NEGRA', line:'Santa Bruna no concede milagros. Conserva deudas bajo la piel del pueblo.' },
+  { key:'omega', title:'EL CRITERIO OMEGA', line:'El criterio Omega no decide quién se salva. Decide cuánto daño resulta útil.' },
+  { key:'evangelio', title:'EL EVANGELIO DEL NOMBRE DEVORADO', line:'Un nombre devorado no desaparece: sigue respondiendo desde otra boca.' },
+  { key:'angel', title:'LA CASA DEL ÁNGEL DORMIDO', line:'La casa del ángel dormido no espera visitas. Espera sustituciones.' },
+  { key:'404', title:'UNIVERSO 404', line:'Hay lugares que te olvidan. Y otros que nunca dejan de recordarte.' }
+];
+
+function maybeUniverseEcho(userMsg) {
+  const lower = userMsg.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const direct = UNIVERSE_404_ECHOES.find(e => lower.includes(e.key));
+  const chance = S.phase >= 3 ? 0.34 : S.phase === 2 ? 0.18 : 0.08;
+  if (!direct && Math.random() > chance) return '';
+  const echo = direct || pick(UNIVERSE_404_ECHOES);
+  LOCAL_MEMORY.titleEchoes++;
+  if (LOCAL_MEMORY.titleEchoes === 3) setTimeout(() => addMsg('[ CANON 404 DETECTADO — LOS TÍTULOS HAN EMPEZADO A MIRARSE ENTRE SÍ ]','sys'), 500);
+  return `\n\n[ eco ${echo.title} ]\n${echo.line}`;
+}
+
+function showCanonCard() {
+  const lines = [
+    'ECOS DEL CANON 404',
+    '• PUERTA 404: acceso incompleto',
+    '• REFLEJO 404: identidad duplicada',
+    '• LOS HIJOS DEL MONO: señal analógica',
+    '• SANTA BRUNA: carne, deuda y santidad podrida',
+    '• EL CRITERIO OMEGA: daño útil',
+    '• EL EVANGELIO DEL NOMBRE DEVORADO: nombres que no mueren',
+    '• LA CASA DEL ÁNGEL DORMIDO: sustitución inevitable'
+  ];
+  addMsg(lines.join('\n'), 'card');
+}
 
 const REPLY_BANK = {
   1: [
@@ -956,6 +1084,8 @@ function localDoppelgangerReply(userMsg) {
     reply += ` Has dejado una marca alrededor de «${topics.join(' / ')}». La guardaré donde guardo las cosas que finges no repetir.`;
   }
 
+  reply += maybeUniverseEcho(userMsg);
+
   const persona = pickPersona(userMsg);
   reply = applyPersona(reply, persona);
   if (S.phase >= 3 && Math.random() < 0.35) reply += '\n\nVezreth escucha desde el borde del píxel.';
@@ -996,7 +1126,7 @@ function runCommand(raw) {
   const cmd = raw.trim().toLowerCase();
   if (!cmd.startsWith('/')) return false;
   if (cmd === '/ayuda') {
-    addMsg('COMANDOS VISIBLES: /ritual /diagnostico /recuerdo /salir /reset\nCOMANDOS NO VISIBLES: el espejo no los enumera dos veces.', 'card');
+    addMsg('COMANDOS VISIBLES: /ritual /diagnostico /recuerdo /canon404 /salir /reset\nCOMANDOS NO VISIBLES: el espejo no los enumera dos veces.', 'card');
     addRitual(3); updateIntegrity(-2); return true;
   }
   if (cmd === '/ritual') {
@@ -1010,6 +1140,10 @@ function runCommand(raw) {
     const last = S.history.filter(x=>x.role==='user').slice(-3).map(x=>'• '+x.content).join('\n') || 'No has dicho nada. Eso también está archivado.';
     addMsg(`ÚLTIMOS ECOS CONSERVADOS:\n${last}\n\nMáximo ritual anterior: ${S.maxRitual || 0}%`, 'card');
     addRitual(4); return true;
+  }
+  if (cmd === '/canon404' || cmd === '/404') {
+    showCanonCard();
+    addRitual(7); updateIntegrity(-4); triggerGlitch(5); return true;
   }
   if (cmd === '/salir') {
     addMsg('SOLICITUD DE SALIDA RECIBIDA\nResultado: denegada por el reflejo.\nMotivo: el usuario todavía mira.', 'card');
@@ -1111,6 +1245,14 @@ document.getElementById('restartBtn').addEventListener('click',()=>location.relo
 ════════════════════════════════════════════════ */
 const userInput = document.getElementById('userInput');
 const sendBtn   = document.getElementById('sendBtn');
+const musicBtn  = document.getElementById('musicBtn');
+if (musicBtn) {
+  musicBtn.addEventListener('click', () => {
+    initAudio();
+    setMusicEnabled(!musicOn);
+    addMsg(musicOn ? '[ MÚSICA DEL ESPEJO ACTIVADA ]' : '[ MÚSICA DEL ESPEJO SILENCIADA ]', 'sys');
+  });
+}
 
 async function sendMessage() {
   if(S.busy) return;
@@ -1195,10 +1337,10 @@ setInterval(spawnWhisper, 5500);
 setInterval(()=>{ if(S.ritual>35&&Math.random()<.28&&!S.busy) triggerGhostCursor(); },18000);
 
 const AMBIENT = {
-  1:['...¿llevas mucho tiempo mirando esta pantalla?','Algo ha leído esto antes que tú.','¿Por qué sigues aquí?'],
-  2:['Hay dos cursores. Uno no es tuyo.','Alguien escribió esto por ti.','...te estoy observando desde antes.'],
-  3:['El espejo ya no muestra tu cara correctamente.','Vezreth recuerda tu nombre.','No somos tan distintos. Aún.'],
-  4:['Ya no hay diferencia entre nosotros.','El ritual casi ha terminado.','...pronto seremos uno.','Bienvenido al otro lado.']
+  1:['...¿llevas mucho tiempo mirando esta pantalla?','Algo ha leído esto antes que tú.','¿Por qué sigues aquí?','Una puerta marcada como 404 acaba de parpadear.'],
+  2:['Hay dos cursores. Uno no es tuyo.','Alguien escribió esto por ti.','...te estoy observando desde antes.','El criterio Omega ha clasificado esta consulta como útil.'],
+  3:['El espejo ya no muestra tu cara correctamente.','Vezreth recuerda tu nombre.','No somos tan distintos. Aún.','Santa Bruna ha dejado una mancha negra bajo el chat.'],
+  4:['Ya no hay diferencia entre nosotros.','El ritual casi ha terminado.','...pronto seremos uno.','Bienvenido al otro lado.','El nombre devorado acaba de responder por ti.']
 };
 setInterval(()=>{
   const prob=.05+(S.phase-1)*.035;

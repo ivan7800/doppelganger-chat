@@ -1,4 +1,4 @@
-# DOPPELGÄNGER PROHIBIDO v2.1
+# DOPPELGÄNGER PROHIBIDO v2.4 — Música del Espejo
 
 Experiencia web interactiva de horror psicológico, preparada para GitHub Pages.
 
@@ -48,3 +48,18 @@ Mientras esté vacío, la app usará el motor local incluido.
 ## v2.1
 
 Versión recomendada: combina el chat avanzado de v2 con la legibilidad aumentada de la versión de texto grande.
+
+
+## v2.3 — Ecos del Universo 404
+
+Esta versión incorpora frases y señales inspiradas en los títulos del canon de I. Roig: `Puerta 404`, `Reflejo 404`, `Los hijos del mono`, `Santa Bruna de la Carne Negra`, `El Criterio Omega`, `El Evangelio del Nombre Devorado` y `La casa del ángel dormido`.
+
+Comandos nuevos:
+
+- `/canon404`
+- `/404`
+
+Los títulos también pueden aparecer como interferencias, susurros y respuestas especiales dentro del chat.
+
+
+Nota v2.3: `Mandíbulas` se ha retirado de los ecos principales porque todavía no está escrito; así el canon visible no mezcla obra publicada/cerrada con proyecto futuro.
