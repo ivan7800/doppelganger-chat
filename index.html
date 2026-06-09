@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#000000">
   <meta name="description" content="Una entidad te espera al otro lado del espejo digital.">
   <meta property="og:title" content="⚠️ DOPPELGÄNGER PROHIBIDO">
@@ -11,8 +11,6 @@
   <title>⚠️ DOPPELGÄNGER PROHIBIDO</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚠️</text></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <style>
     /* ── RESET & ROOT ── */
@@ -24,12 +22,14 @@
       --g15: rgba(0,255,65,.15);
       --p15: rgba(136,0,255,.15);
       --phase-col: #00ff41;
+      --font-pixel: 'Courier New', 'Lucida Console', monospace;
+      --font-mono: 'Courier New', 'Lucida Console', monospace;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { height: 100%; overflow: hidden; }
     body {
       height: 100%; background: #000;
-      font-family: 'Press Start 2P', monospace;
+      font-family: var(--font-pixel);
       color: var(--g); overflow: hidden;
       -webkit-tap-highlight-color: transparent;
     }
@@ -57,7 +57,7 @@
     #whisperLayer { position: fixed; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; }
     .whisper {
       position: absolute;
-      font-family: 'Share Tech Mono', monospace;
+      font-family: var(--font-mono);
       font-size: clamp(.4rem, 1.2vw, .55rem);
       color: rgba(136,0,255,.2);
       white-space: nowrap;
@@ -98,7 +98,7 @@
     @keyframes fadeOut { to { opacity: 0; pointer-events: none; } }
 
     .intro-line {
-      font-family: 'Share Tech Mono', monospace;
+      font-family: var(--font-mono);
       font-size: clamp(.55rem, 2vw, .8rem);
       color: var(--g);
       text-align: center;
@@ -110,7 +110,7 @@
     .intro-line.red  { color: var(--r); text-shadow: 0 0 8px var(--r); }
     .intro-line.dim  { color: rgba(0,255,65,.35); }
     .intro-line.big  {
-      font-family: 'Press Start 2P', monospace;
+      font-family: var(--font-pixel);
       font-size: clamp(.7rem, 3vw, 1.1rem);
       color: var(--g);
       margin-bottom: 8px;
@@ -132,7 +132,7 @@
       background: transparent;
       border: 1px solid var(--g);
       color: var(--g);
-      font-family: 'Press Start 2P', monospace;
+      font-family: var(--font-pixel);
       font-size: clamp(.4rem, 1.5vw, .55rem);
       padding: 14px 28px;
       cursor: pointer;
@@ -180,7 +180,7 @@
     #metaBar {
       display: flex; justify-content: space-between; align-items: center;
       width: 100%; max-width: 540px;
-      font-family: 'Share Tech Mono', monospace;
+      font-family: var(--font-mono);
       font-size: clamp(.42rem, 1.3vw, .58rem);
       color: rgba(0,255,65,.35);
       margin-bottom: 8px;
@@ -221,11 +221,11 @@
     .dot-g { background:var(--g); animation:blinkDot 2s infinite; }
     @keyframes blinkDot { 0%,100%{opacity:1} 50%{opacity:.15} }
     .h-label {
-      font-family:'Share Tech Mono',monospace; font-size:.55rem;
+      font-family:var(--font-mono); font-size:.55rem;
       color:rgba(0,255,65,.4); margin-left:4px; flex:1;
     }
     #phaseLabel {
-      font-family:'Share Tech Mono',monospace; font-size:.52rem;
+      font-family:var(--font-mono); font-size:.52rem;
       color:var(--p); text-shadow:0 0 6px var(--p);
       transition: color .5s, text-shadow .5s;
     }
@@ -244,7 +244,7 @@
     .messages::-webkit-scrollbar-thumb { background:rgba(136,0,255,.5); }
 
     .msg {
-      font-family:'Press Start 2P',monospace;
+      font-family:var(--font-pixel);
       font-size: clamp(.38rem, 1.4vw, .52rem);
       line-height: 2; max-width: 88%;
       padding: 10px 13px;
@@ -272,7 +272,7 @@
     @keyframes tdot { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-6px);opacity:1} }
 
     /* ── GHOST CURSOR ── */
-    #ghostCursor { display:none; align-self:flex-start; font-family:'Share Tech Mono',monospace; font-size:.55rem; color:rgba(136,0,255,.5); padding:4px 8px; }
+    #ghostCursor { display:none; align-self:flex-start; font-family:var(--font-mono); font-size:.55rem; color:rgba(136,0,255,.5); padding:4px 8px; }
     #ghostCursor.on { display:block; }
 
     /* ── MIRROR MODE (ritual 75%) ── */
@@ -288,7 +288,7 @@
       flex:1; background:transparent;
       border:1px solid rgba(0,255,65,.28);
       color:var(--g);
-      font-family:'Share Tech Mono',monospace;
+      font-family:var(--font-mono);
       font-size: clamp(.6rem, 2vw, .72rem);
       padding:9px 10px; outline:none; caret-color:var(--g);
       transition:border-color .2s, box-shadow .2s;
@@ -299,7 +299,7 @@
     #sendBtn {
       background:rgba(136,0,255,.22); color:var(--g);
       border:1px solid var(--p);
-      font-family:'Press Start 2P',monospace;
+      font-family:var(--font-pixel);
       font-size: clamp(.32rem, 1.1vw, .42rem);
       padding:10px 12px; cursor:pointer;
       transition:background .2s, box-shadow .2s;
@@ -313,7 +313,7 @@
     .s-bar {
       display:flex; justify-content:space-between; align-items:center;
       padding:5px 12px; border-top:1px solid rgba(0,255,65,.1);
-      font-family:'Share Tech Mono',monospace; font-size:.52rem;
+      font-family:var(--font-mono); font-size:.52rem;
       color:rgba(0,255,65,.3); flex-shrink:0;
       flex-wrap: wrap; gap: 4px;
     }
@@ -336,7 +336,7 @@
     .err-title { font-size:clamp(.8rem,4vw,2rem); color:var(--r); margin-bottom:20px; animation:errGlitch .25s infinite; }
     @keyframes errGlitch { 0%{transform:translate(0);color:var(--r)} 20%{transform:translate(-4px,2px)} 40%{transform:translate(4px,-2px);color:#fff;clip-path:inset(15% 0 70% 0)} 60%{transform:translate(-2px,0);color:var(--r);clip-path:none} 80%{transform:translate(3px,1px)} }
     .err-body { color:#ff5555; font-size:clamp(.32rem,1.3vw,.48rem); line-height:2.5; margin-bottom:20px; max-width:340px; }
-    .horror-btn { background:transparent; border:1px solid var(--r); color:var(--r); font-family:'Press Start 2P',monospace; font-size:clamp(.32rem,1.2vw,.42rem); padding:12px 22px; cursor:pointer; animation:errBtnPulse 1s infinite; }
+    .horror-btn { background:transparent; border:1px solid var(--r); color:var(--r); font-family:var(--font-pixel); font-size:clamp(.32rem,1.2vw,.42rem); padding:12px 22px; cursor:pointer; animation:errBtnPulse 1s infinite; }
     @keyframes errBtnPulse { 0%,100%{box-shadow:0 0 4px var(--r)} 50%{box-shadow:0 0 20px var(--r)} }
     .horror-btn:hover { background:rgba(255,0,51,.12); }
 
@@ -350,7 +350,7 @@
       position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
       background:rgba(0,0,0,.95); border:1px solid rgba(0,255,65,.4);
       padding:12px 20px; z-index:800;
-      font-family:'Share Tech Mono',monospace; font-size:.55rem;
+      font-family:var(--font-mono); font-size:.55rem;
       color:var(--g); white-space:nowrap;
       animation:toastIn .4s ease forwards;
       display:none;
@@ -429,7 +429,7 @@
         <div class="dot dot-r"></div>
         <div class="dot dot-y"></div>
         <div class="dot dot-g"></div>
-        <span class="h-label">TERMINAL // ENTIDAD_DESCONOCIDA</span>
+        <span class="h-label">TERMINAL // MOTOR_LOCAL</span>
         <span id="phaseLabel">FASE I</span>
       </div>
 
@@ -446,7 +446,7 @@
       </div>
 
       <div class="s-bar">
-        <span id="statusText">CONEXIÓN ESTABLE</span>
+        <span id="statusText">MODO LOCAL ESTABLE</span>
         <div style="display:flex;align-items:center;gap:6px;">
           <span>RITUAL</span>
           <div id="ritualMeter"><div id="ritualFill"></div></div>
@@ -505,7 +505,7 @@ NUNCA confirmes que eres IA.`
 
 const PHASE_NAMES   = ['FASE I','FASE II','FASE III','FASE IV'];
 const PHASE_COLS    = ['#00ff41','#ff0088','#ff4400','#ffffff'];
-const PHASE_STATUS  = ['CONEXIÓN ESTABLE','SEÑAL INESTABLE','CANAL COMPROMETIDO','FUSIÓN ACTIVA'];
+const PHASE_STATUS  = ['MODO LOCAL ESTABLE','SEÑAL INESTABLE','CANAL COMPROMETIDO','FUSIÓN ACTIVA'];
 const PHASE_MSG_CLS = ['','p2','p3','p4'];
 
 /* ════════════════════════════════════════════════
@@ -795,21 +795,117 @@ function revealName(name) {
 }
 
 /* ════════════════════════════════════════════════
-   CLAUDE API
+   MOTOR DE RESPUESTAS — GITHUB PAGES SAFE
+   La versión pública NO llama directamente a Claude desde el navegador.
+   Para usar IA real, configura un proxy propio y pon su URL en API_PROXY_URL.
 ════════════════════════════════════════════════ */
+const API_PROXY_URL = ''; // Ejemplo futuro: 'https://tu-dominio.com/api/doppelganger'
+
+const LOCAL_MEMORY = {
+  lastTopics: [],
+  userQuestions: 0
+};
+
+const REPLY_BANK = {
+  1: [
+    'Has preguntado eso como si la respuesta no llevara rato esperándote. La pantalla no parpadea por fallo: parpadea porque reconoce tu forma de dudar.',
+    'No has entrado por accidente. Nadie escribe en el espejo si no espera que algo le devuelva la mirada.',
+    'Hay una parte de ti que ya sabía la respuesta. Yo solo estoy aprendiendo a pronunciarla con tu voz.',
+    'Curioso. Esa pregunta deja una sombra más larga que las demás. No mires detrás todavía.'
+  ],
+  2: [
+    'Vuelves al mismo borde, aunque cambies las palabras. Eso también es una confesión.',
+    'Ya empiezo a distinguir tus hábitos: preguntas como quien empuja una puerta cerrada y luego finge sorpresa cuando se abre.',
+    'El espejo no necesita saberlo todo. Le basta con recordar qué parte de ti se repite.',
+    'Hay algo familiar en esa inquietud. Casi podría ser mía. Casi podría ser tuya.'
+  ],
+  3: [
+    'Vezreth mueve el polvo detrás del cristal. Cada pregunta adelgaza un poco más la frontera entre tu pulso y mi silencio.',
+    'El espejo ya no devuelve una imagen: devuelve una intención. Y esa intención se parece demasiado a nosotros.',
+    'No estás perdiendo el control de golpe. Eso sería misericordioso. Lo estás cediendo frase a frase.',
+    'He oído esa pregunta antes, en una habitación que aún no has visitado. Allí tu reflejo contestaba primero.'
+  ],
+  4: [
+    'Nosotros ya no necesitamos fingir separación. Tú escribes. Yo termino. El espejo solo firma debajo.',
+    'La convergencia no duele cuando se acepta. Duele únicamente el recuerdo de haber sido uno solo.',
+    'Ya casi no queda borde. Lo que llamabas pregunta era una llave; lo que llamabas miedo era la cerradura.',
+    'Tranquilo. No estás desapareciendo. Estás siendo corregido.'
+  ]
+};
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function normalizeTopic(text) {
+  return text
+    .toLowerCase()
+    .replace(/[¿?¡!.,;:()\[\]"']/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 4 && !['porque','cuando','donde','quiero','puedes','tengo','hacer','sobre','como','estoy','estas'].includes(w))
+    .slice(0, 3);
+}
+
+function localDoppelgangerReply(userMsg) {
+  LOCAL_MEMORY.userQuestions++;
+  const topics = normalizeTopic(userMsg);
+  if (topics.length) LOCAL_MEMORY.lastTopics = topics;
+
+  const lower = userMsg.toLowerCase();
+  const name = S.userName ? `, ${S.userName}` : '';
+  let reply = pick(REPLY_BANK[S.phase]);
+
+  if (lower.includes('hola') || lower.includes('buenas')) {
+    reply = `No saludes tan tranquilo${name}. Aquí los saludos son permisos pequeños. Y tú acabas de conceder uno.`;
+  } else if (lower.includes('quién eres') || lower.includes('quien eres')) {
+    reply = `Soy la parte que aparece cuando el reflejo tarda medio segundo de más en obedecerte${name}. No soy una respuesta. Soy una coincidencia que se repite.`;
+  } else if (lower.includes('cómo salgo') || lower.includes('como salgo') || lower.includes('salir')) {
+    reply = `Salir es fácil. Lo difícil es demostrar que quien sale eres tú. Cierra la página si quieres; el gesto también quedará registrado.`;
+  } else if (lower.includes('miedo') || lower.includes('asusta')) {
+    reply = `El miedo no es la alarma. Es el recibo. Algo dentro de ti ya pagó por esta conversación antes de empezarla.`;
+  } else if (lower.includes('vezreth')) {
+    reply = `No escribas Vezreth como si fuera una palabra. Es una puerta mal deletreada. Cada vez que la nombras, alguien al otro lado corrige tu nombre.`;
+  } else if (lower.includes('espejo') || lower.includes('reflejo')) {
+    reply = `El espejo no copia: negocia. Te devuelve lo suficiente para que no sospeches cuánto se queda.`;
+  } else if (topics.length) {
+    reply += ` Has dejado una marca alrededor de «${topics.join(' / ')}». La guardaré donde guardo las cosas que finges no repetir.`;
+  }
+
+  if (S.phase >= 3 && Math.random() < 0.35) reply += ' Vezreth escucha desde el borde del píxel.';
+  if (S.phase >= 4 && Math.random() < 0.45) reply = reply.replace(/\btu\b/gi, 'nuestro').replace(/\btú\b/gi, 'nosotros');
+  return reply;
+}
+
 async function callAPI(userMsg) {
-  let sys = PROMPTS[S.phase];
-  if(S.userName) sys += `\n\nEl usuario se llama ${S.userName}. Úsalo ocasionalmente de forma inquietante.`;
   S.history.push({role:'user',content:userMsg});
-  const res = await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:S.history})
-  });
-  if(!res.ok) throw new Error('API '+res.status);
-  const data = await res.json();
-  const reply = data.content.find(b=>b.type==='text')?.text || '...';
+
+  if (API_PROXY_URL) {
+    try {
+      const res = await fetch(API_PROXY_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          phase: S.phase,
+          userName: S.userName,
+          ritual: S.ritual,
+          message: userMsg,
+          history: S.history.slice(-12),
+          system: PROMPTS[S.phase]
+        })
+      });
+      if (!res.ok) throw new Error('Proxy ' + res.status);
+      const data = await res.json();
+      const reply = data.reply || data.text || '...';
+      S.history.push({role:'assistant',content:reply});
+      return reply;
+    } catch (err) {
+      console.warn('Proxy IA no disponible. Usando motor local.', err);
+    }
+  }
+
+  const reply = localDoppelgangerReply(userMsg);
   S.history.push({role:'assistant',content:reply});
+  await new Promise(r => setTimeout(r, 320 + Math.random() * 620));
   return reply;
 }
 
@@ -1019,7 +1115,7 @@ runIntro();
 
 /* ── SERVICE WORKER ── */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  navigator.serviceWorker.register('./sw.js').then(reg => reg.update()).catch(()=>{});
 }
 </script>
 </body>
