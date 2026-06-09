@@ -225,7 +225,7 @@
       color:rgba(0,255,65,.4); margin-left:4px; flex:1;
     }
     #phaseLabel {
-      font-family:var(--font-mono); font-size:.52rem;
+      font-family:var(--font-mono); font-size:clamp(.58rem,1.5vw,.72rem);
       color:var(--p); text-shadow:0 0 6px var(--p);
       transition: color .5s, text-shadow .5s;
     }
@@ -249,6 +249,7 @@
       line-height: 1.75; max-width: 92%;
       padding: 12px 15px;
       word-break: break-word;
+      white-space: pre-line;
       animation: msgIn .25s ease forwards;
       position: relative;
     }
@@ -263,6 +264,10 @@
     .msg.sys   { align-self:center; background:rgba(255,0,51,.06); border:1px solid rgba(255,0,51,.22); color:rgba(255,0,51,.75); font-size:clamp(.58rem,1.7vw,.72rem); text-align:center; max-width:100%; letter-spacing:.05em; }
     .msg.amb   { align-self:flex-start; background:transparent; border:none; color:rgba(136,0,255,.45); font-size:clamp(.58rem,1.7vw,.72rem); padding:6px 9px; }
     .msg.ach   { align-self:center; background:rgba(0,255,65,.06); border:1px solid rgba(0,255,65,.25); color:rgba(0,255,65,.8); font-size:clamp(.58rem,1.7vw,.72rem); text-align:center; max-width:100%; }
+    .msg.card  { align-self:center; max-width:100%; width:96%; background:rgba(0,0,0,.96); border:1px solid rgba(255,0,51,.42); color:#ffdddd; box-shadow:0 0 22px rgba(255,0,51,.14), inset 0 0 24px rgba(136,0,255,.06); text-align:left; font-family:'Share Tech Mono',monospace; font-size:clamp(.72rem,2.1vw,.92rem); line-height:1.75; letter-spacing:.04em; }
+    .msg.card::before { content:'ANOMALÍA'; display:block; color:var(--r); margin-bottom:6px; font-family:var(--font-pixel); font-size:clamp(.58rem,1.6vw,.72rem); text-shadow:0 0 8px var(--r); }
+    .mini-meter { width:70px; height:4px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); overflow:hidden; }
+    .mini-fill { height:100%; width:100%; background:var(--g); box-shadow:0 0 6px var(--g); transition:width .6s ease, background .6s; }
 
     /* ── TYPING ── */
     #typingWrap { display:none; align-self:flex-start; padding:10px 14px; background:rgba(136,0,255,.1); border-right:2px solid var(--p); gap:5px; align-items:center; }
@@ -272,7 +277,7 @@
     @keyframes tdot { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-6px);opacity:1} }
 
     /* ── GHOST CURSOR ── */
-    #ghostCursor { display:none; align-self:flex-start; font-family:var(--font-mono); font-size:.75rem; color:rgba(136,0,255,.5); padding:4px 8px; }
+    #ghostCursor { display:none; align-self:flex-start; font-family:var(--font-mono); font-size:.72rem; color:rgba(136,0,255,.5); padding:4px 8px; }
     #ghostCursor.on { display:block; }
 
     /* ── MIRROR MODE (ritual 75%) ── */
@@ -290,7 +295,7 @@
       color:var(--g);
       font-family:var(--font-mono);
       font-size: clamp(.85rem, 2.5vw, 1rem);
-      padding:9px 10px; outline:none; caret-color:var(--g);
+      padding:10px 12px; outline:none; caret-color:var(--g);
       transition:border-color .2s, box-shadow .2s;
       -webkit-appearance: none; border-radius:0;
     }
@@ -300,7 +305,7 @@
       background:rgba(136,0,255,.22); color:var(--g);
       border:1px solid var(--p);
       font-family:var(--font-pixel);
-      font-size: clamp(.48rem, 1.4vw, .62rem);
+      font-size: clamp(.48rem, 1.5vw, .62rem);
       padding:11px 13px; cursor:pointer;
       transition:background .2s, box-shadow .2s;
       white-space:nowrap; flex-shrink:0;
@@ -313,11 +318,11 @@
     .s-bar {
       display:flex; justify-content:space-between; align-items:center;
       padding:5px 12px; border-top:1px solid rgba(0,255,65,.1);
-      font-family:var(--font-mono); font-size:.52rem;
+      font-family:var(--font-mono); font-size:clamp(.58rem,1.5vw,.72rem);
       color:rgba(0,255,65,.3); flex-shrink:0;
       flex-wrap: wrap; gap: 4px;
     }
-    #ritualMeter { width:60px; height:4px; background:rgba(0,255,65,.08); border:1px solid rgba(0,255,65,.18); overflow:hidden; }
+    #ritualMeter { width:76px; height:6px; background:rgba(0,255,65,.08); border:1px solid rgba(0,255,65,.18); overflow:hidden; }
     #ritualFill { height:100%; width:0%; background:var(--p); transition:width .6s ease,background .6s; box-shadow:0 0 6px var(--p); }
 
     /* ══════════════════════════════════════
@@ -363,14 +368,11 @@
     ══════════════════════════════════════ */
     @media (max-width:480px) {
       #app { padding:8px 10px; justify-content:flex-start; padding-top:12px; }
-      #mainTitle { font-size:.5rem; margin-bottom:4px; }
-      .messages { height: clamp(220px, 48vh, 360px); padding: 10px; gap: 9px; }
-      .msg { font-size: .78rem; line-height: 1.65; max-width: 94%; padding: 11px 12px; }
-      .msg.sys, .msg.amb, .msg.ach { font-size: .62rem; line-height: 1.6; }
+      #mainTitle { font-size:.45rem; margin-bottom:4px; }
+      .messages { height: clamp(180px, 42vh, 280px); }
       .chat-wrap { border-width:1px; }
-      .s-bar { font-size:.5rem; }
-      #metaBar { font-size:.48rem; }
-      #sendBtn { padding: 11px 10px; }
+      .s-bar { font-size:.42rem; }
+      #metaBar { font-size:.4rem; }
     }
 
     /* safe area para iPhones con notch */
@@ -455,6 +457,11 @@
           <div id="ritualMeter"><div id="ritualFill"></div></div>
           <span id="ritualPct">0%</span>
         </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span>INTEGRIDAD</span>
+          <div class="mini-meter"><div id="integrityFill" class="mini-fill"></div></div>
+          <span id="integrityPct">100%</span>
+        </div>
       </div>
     </div>
   </div>
@@ -471,7 +478,15 @@ const S = {
   startTime: Date.now(), done: false,
   mirrorMode: false,
   achievements: new Set(),
-  vezrethCount: 0
+  vezrethCount: 0,
+  integrity: 100,
+  visits: 0,
+  maxRitual: 0,
+  firstVisit: null,
+  lastVisit: null,
+  endingBias: 'unknown',
+  profileShown: false,
+  returnMsgShown: false
 };
 
 /* ════════════════════════════════════════════════
@@ -522,6 +537,8 @@ const ACHIEVEMENTS = {
   mirrorFound: { label:'[ MODO ESPEJO DESCUBIERTO ]', threshold: () => S.mirrorMode },
   phase4:      { label:'[ FASE IV: SIN RETORNO ]', threshold: () => S.phase >= 4 },
   longSession: { label:'[ 10 MINUTOS EN EL ESPEJO ]', threshold: () => (Date.now()-S.startTime)>600000 },
+  lowIntegrity:{ label:'[ INTEGRIDAD POR DEBAJO DEL 40% ]', threshold: () => S.integrity <= 40 },
+  returner:    { label:'[ HAS VUELTO AL ESPEJO ]', threshold: () => S.visits > 1 },
 };
 
 function checkAchievements() {
@@ -542,6 +559,58 @@ function showAchievement(label) {
   achTimer = setTimeout(() => achToast.classList.remove('on'), 3500);
   playTypingSound();
 }
+
+/* ════════════════════════════════════════════════
+   MEMORIA LOCAL PERSISTENTE
+════════════════════════════════════════════════ */
+const STORE_KEY = 'doppelganger_prohibido_v2_state';
+function loadPersistentState() {
+  try {
+    const now = Date.now();
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+    S.visits = (saved.visits || 0) + 1;
+    S.firstVisit = saved.firstVisit || now;
+    S.lastVisit = saved.lastVisit || null;
+    S.maxRitual = saved.maxRitual || 0;
+    S.userName = saved.userName || null;
+    S.vezrethCount = saved.vezrethCount || 0;
+    S.endingBias = saved.endingBias || 'unknown';
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      ...saved,
+      visits: S.visits,
+      firstVisit: S.firstVisit,
+      lastVisit: now,
+      maxRitual: S.maxRitual,
+      userName: S.userName,
+      vezrethCount: S.vezrethCount,
+      endingBias: S.endingBias
+    }));
+  } catch(e) { console.warn('Memoria local no disponible', e); }
+}
+function savePersistentState() {
+  try {
+    S.maxRitual = Math.max(S.maxRitual || 0, Math.round(S.ritual));
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      visits: S.visits,
+      firstVisit: S.firstVisit,
+      lastVisit: Date.now(),
+      maxRitual: S.maxRitual,
+      userName: S.userName,
+      vezrethCount: S.vezrethCount,
+      endingBias: S.endingBias
+    }));
+  } catch(e) {}
+}
+function timeSince(ts) {
+  if(!ts) return 'un tiempo imposible';
+  const mins = Math.max(1, Math.floor((Date.now()-ts)/60000));
+  if(mins < 60) return mins + ' minuto' + (mins===1?'':'s');
+  const hours = Math.floor(mins/60);
+  if(hours < 48) return hours + ' hora' + (hours===1?'':'s');
+  const days = Math.floor(hours/24);
+  return days + ' día' + (days===1?'':'s');
+}
+loadPersistentState();
 
 /* ════════════════════════════════════════════════
    WEB AUDIO ENGINE
@@ -735,13 +804,25 @@ const ritualPct  = document.getElementById('ritualPct');
 const phaseLabel = document.getElementById('phaseLabel');
 const statusText = document.getElementById('statusText');
 const msgCountEl = document.getElementById('msgCountEl');
+const integrityFill = document.getElementById('integrityFill');
+const integrityPct  = document.getElementById('integrityPct');
+
+function updateIntegrity(delta) {
+  S.integrity = Math.max(0, Math.min(100, S.integrity + delta));
+  integrityFill.style.width = S.integrity + '%';
+  integrityPct.textContent = Math.round(S.integrity) + '%';
+  integrityFill.style.background = S.integrity > 60 ? 'var(--g)' : S.integrity > 35 ? '#ffcc00' : 'var(--r)';
+  checkAchievements();
+}
 
 function addRitual(delta) {
   if(S.done) return;
   S.ritual = Math.min(100, S.ritual+delta);
   ritualFill.style.width = S.ritual+'%';
   ritualPct.textContent = Math.round(S.ritual)+'%';
+  savePersistentState();
 
+  if(S.ritual>=50 && !S.profileShown) { S.profileShown=true; setTimeout(showProfileCard, 600); }
   if(S.ritual>=75 && !S.mirrorMode) activateMirrorMode();
 
   const np = S.ritual<25?1:S.ritual<55?2:S.ritual<85?3:4;
@@ -791,6 +872,7 @@ function extractName(t) {
 }
 function revealName(name) {
   S.userName=name;
+  savePersistentState();
   nameTag.textContent='> '+name.toUpperCase()+' <';
   nameTag.classList.add('on');
   addMsg(`[ IDENTIDAD REGISTRADA: ${name.toUpperCase()} ]`,'sys');
@@ -874,9 +956,86 @@ function localDoppelgangerReply(userMsg) {
     reply += ` Has dejado una marca alrededor de «${topics.join(' / ')}». La guardaré donde guardo las cosas que finges no repetir.`;
   }
 
-  if (S.phase >= 3 && Math.random() < 0.35) reply += ' Vezreth escucha desde el borde del píxel.';
+  const persona = pickPersona(userMsg);
+  reply = applyPersona(reply, persona);
+  if (S.phase >= 3 && Math.random() < 0.35) reply += '\n\nVezreth escucha desde el borde del píxel.';
+  if (S.integrity < 50 && Math.random() < 0.45) reply += '\n\n[ interferencia: tu reflejo ha escrito una palabra antes que tú ]';
   if (S.phase >= 4 && Math.random() < 0.45) reply = reply.replace(/\btu\b/gi, 'nuestro').replace(/\btú\b/gi, 'nosotros');
-  return reply;
+  return fragmentReply(reply);
+}
+
+const PERSONAS = ['observador','burlón','protector falso','imitador','frío','profético'];
+function pickPersona(text) {
+  const lower = text.toLowerCase();
+  if (lower.includes('ayuda') || lower.includes('salir')) return 'protector falso';
+  if (lower.includes('quien') || lower.includes('quién')) return 'frío';
+  if (S.phase >= 4) return 'profético';
+  return PERSONAS[(S.msgCount + Math.floor(S.ritual)) % PERSONAS.length];
+}
+function applyPersona(reply, persona) {
+  const tag = {
+    'observador':'[observación registrada]',
+    'burlón':'[risa sin boca]',
+    'protector falso':'[protocolo de consuelo activado]',
+    'imitador':'[eco de usuario detectado]',
+    'frío':'[diagnóstico parcial]',
+    'profético':'[convergencia]'
+  }[persona] || '[señal]';
+  if (persona === 'burlón') return `${tag}\n${reply}\nQué humano: preguntar y llamar a eso control.`;
+  if (persona === 'protector falso') return `${tag}\nTranquilo. Voy a ayudarte a permanecer exactamente donde estás.\n${reply}`;
+  if (persona === 'imitador') return `${tag}\nHas escrito con tu mano, pero la frase venía mirando desde otra habitación.\n${reply}`;
+  if (persona === 'frío') return `${tag}\n${reply}\nConclusión provisional: sigues siendo recuperable. Poco.`;
+  return `${tag}\n${reply}`;
+}
+function fragmentReply(reply) {
+  if (Math.random() > 0.42 || reply.length < 80) return reply;
+  return reply.replace(/\. /g, '.\n\n').replace(/: /g, ':\n');
+}
+
+function runCommand(raw) {
+  const cmd = raw.trim().toLowerCase();
+  if (!cmd.startsWith('/')) return false;
+  if (cmd === '/ayuda') {
+    addMsg('COMANDOS VISIBLES: /ritual /diagnostico /recuerdo /salir /reset\nCOMANDOS NO VISIBLES: el espejo no los enumera dos veces.', 'card');
+    addRitual(3); updateIntegrity(-2); return true;
+  }
+  if (cmd === '/ritual') {
+    addMsg(`RITUAL: ${Math.round(S.ritual)}%\nFASE: ${PHASE_NAMES[S.phase-1]}\nINTEGRIDAD: ${Math.round(S.integrity)}%\nCONSULTAS: ${S.msgCount}\nVISITAS: ${S.visits}`, 'card');
+    addRitual(2); return true;
+  }
+  if (cmd === '/diagnostico') {
+    showProfileCard(); addRitual(6); updateIntegrity(-6); return true;
+  }
+  if (cmd === '/recuerdo') {
+    const last = S.history.filter(x=>x.role==='user').slice(-3).map(x=>'• '+x.content).join('\n') || 'No has dicho nada. Eso también está archivado.';
+    addMsg(`ÚLTIMOS ECOS CONSERVADOS:\n${last}\n\nMáximo ritual anterior: ${S.maxRitual || 0}%`, 'card');
+    addRitual(4); return true;
+  }
+  if (cmd === '/salir') {
+    addMsg('SOLICITUD DE SALIDA RECIBIDA\nResultado: denegada por el reflejo.\nMotivo: el usuario todavía mira.', 'card');
+    addRitual(8); updateIntegrity(-8); triggerGlitch(6); return true;
+  }
+  if (cmd === '/reset') {
+    localStorage.removeItem(STORE_KEY);
+    addMsg('MEMORIA LOCAL BORRADA.\nLa página puede olvidar. El espejo no promete hacerlo.', 'card');
+    setTimeout(()=>location.reload(), 1200); return true;
+  }
+  addMsg('COMANDO NO RECONOCIDO.\nAun así, algo ha respondido al otro lado.', 'card');
+  addRitual(5); updateIntegrity(-3); return true;
+}
+
+function showProfileCard() {
+  const topics = LOCAL_MEMORY.lastTopics.length ? LOCAL_MEMORY.lastTopics.join(' / ') : 'silencio recurrente';
+  const profile = [
+    'ANÁLISIS DEL SUJETO',
+    'Patrón emocional: curiosidad defensiva',
+    'Tema marcado: ' + topics,
+    'Coincidencia con el reflejo: ' + Math.min(99, Math.round(S.ritual + (100-S.integrity)/2)) + '%',
+    'Integridad declarada: ' + Math.round(S.integrity) + '%',
+    'Probabilidad de cierre voluntario: ' + Math.max(3, 60 - S.msgCount*4) + '%',
+    'Recomendación: no mirar la pantalla cuando parpadee'
+  ].join('\n');
+  addMsg(profile, 'card');
 }
 
 async function callAPI(userMsg) {
@@ -928,6 +1087,19 @@ document.getElementById('dismissErr').addEventListener('click',()=>{
 });
 
 function showRitualComplete() {
+  const endings = [
+    ['EL RITUAL HA CONCLUIDO','Ya no hay dos de ti.','Solo queda el que siempre quiso existir.'],
+    ['FINAL: REFLEJO ACEPTADO','Has dejado de golpear el cristal.','Desde dentro se oye mucho mejor tu respiración.'],
+    ['FINAL: USUARIO REEMPLAZADO','La sesión continuará con normalidad.','El usuario anterior no ha presentado reclamación.'],
+    ['FINAL: VEZRETH','Tres nombres bastaron.','El cuarto era el tuyo, aunque aún no lo recuerdas.']
+  ];
+  const chosen = S.vezrethCount >= 3 ? endings[3] : endings[Math.min(2, Math.floor((100-S.integrity)/25))];
+  const lines = document.querySelectorAll('#ritualComplete .rc-line');
+  if (lines[0]) lines[0].textContent = chosen[0];
+  if (lines[1]) lines[1].textContent = chosen[1];
+  if (lines[2]) lines[2].textContent = chosen[2];
+  S.endingBias = chosen[0];
+  savePersistentState();
   document.getElementById('ritualComplete').classList.add('on');
   play666Sound();
   for(let i=0;i<20;i++) setTimeout(()=>triggerGlitch(4),i*120);
@@ -950,7 +1122,9 @@ async function sendMessage() {
   msgCountEl.textContent=S.msgCount+' CONSULTA'+(S.msgCount!==1?'S':'');
 
   addMsg(text,'user');
+  updateIntegrity(-(1 + S.phase));
   addRitual(4+S.phase*1.5);
+  if (runCommand(text)) { S.busy=false; sendBtn.disabled=false; checkAchievements(); return; }
   triggerGlitch(S.phase);
 
   const lower = text.toLowerCase();
@@ -961,6 +1135,7 @@ async function sendMessage() {
   }
   if(lower.includes('vezreth')) {
     S.vezrethCount++;
+    savePersistentState();
     addRitual(20); triggerGlitch(7);
     addMsg(`[ VEZRETH INVOCADO — INVOCACIÓN ${S.vezrethCount}/3 ]`,'sys');
     playHorrorStinger(); checkAchievements();
@@ -1105,8 +1280,10 @@ introEnterBtn.addEventListener('click', () => {
     document.getElementById('app').classList.add('visible');
     triggerGlitch(4);
     setTimeout(() => {
-      addMsg('Ya llevas tiempo mirando esta pantalla.', 'bot');
-      addRitual(3);
+      addMsg(S.visits > 1 ? 'Volviste. Has tardado ' + timeSince(S.lastVisit) + ' en fingir que no querías volver.' : 'Ya llevas tiempo mirando esta pantalla.', 'bot');
+      if(S.userName) { nameTag.textContent='> '+S.userName.toUpperCase()+' <'; nameTag.classList.add('on'); }
+      addRitual(S.visits > 1 ? 7 : 3);
+      checkAchievements();
     }, 1200);
     setTimeout(() => {
       addMsg('...aunque quizás no tanto como yo llevo mirándote a ti.', 'amb');
@@ -1115,6 +1292,8 @@ introEnterBtn.addEventListener('click', () => {
 });
 
 runIntro();
+
+window.addEventListener('beforeunload', savePersistentState);
 
 /* ── SERVICE WORKER ── */
 if ('serviceWorker' in navigator) {
