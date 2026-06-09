@@ -2,207 +2,1025 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚠️ ERROR 666</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Una entidad te espera al otro lado del espejo digital.">
+  <meta property="og:title" content="⚠️ DOPPELGÄNGER PROHIBIDO">
+  <meta property="og:description" content="No consultes lo que no quieres saber.">
+  <meta property="og:image" content="icon-512.png">
+  <title>⚠️ DOPPELGÄNGER PROHIBIDO</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚠️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
+    /* ── RESET & ROOT ── */
+    :root {
+      --g: #00ff41;
+      --p: #8800ff;
+      --r: #ff0033;
+      --w: #ffffff;
+      --g15: rgba(0,255,65,.15);
+      --p15: rgba(136,0,255,.15);
+      --phase-col: #00ff41;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; overflow: hidden; }
     body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      color: #00ff00;
-      font-family: 'Press Start 2P', cursive;
+      height: 100%; background: #000;
+      font-family: 'Press Start 2P', monospace;
+      color: var(--g); overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ── CANVAS BG ── */
+    #bgCanvas { position: fixed; inset: 0; z-index: 0; }
+
+    /* ── SCANLINES ── */
+    #scanlines {
+      position: fixed; inset: 0; z-index: 100; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,.1) 2px, rgba(0,0,0,.1) 4px
+      );
+    }
+
+    /* ── GLITCH LAYER ── */
+    #glitchLayer { position: fixed; inset: 0; z-index: 101; pointer-events: none; overflow: hidden; }
+    .g-line {
+      position: absolute; height: 2px; opacity: 0;
+      transition: opacity .05s;
+    }
+
+    /* ── WHISPER LAYER ── */
+    #whisperLayer { position: fixed; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; }
+    .whisper {
+      position: absolute;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(.4rem, 1.2vw, .55rem);
+      color: rgba(136,0,255,.2);
+      white-space: nowrap;
+      animation: whisperDrift linear forwards;
+    }
+    @keyframes whisperDrift {
+      from { opacity:0; right: -200px; }
+      10%  { opacity:1; }
+      90%  { opacity:.2; }
+      to   { opacity:0; right: 110%; }
+    }
+
+    /* ── CORRUPT LAYER (fase 4) ── */
+    #corruptLayer { position: fixed; inset: 0; z-index: 8; pointer-events: none; display: none; overflow: hidden; }
+    #corruptLayer.on { display: block; }
+    .c-strip {
+      position: absolute; left: 0; right: 0;
+      background: rgba(255,0,51,.5);
+      animation: stripFall linear infinite;
+    }
+    @keyframes stripFall {
+      from { transform: translateY(-20px); opacity: 0; }
+      5%   { opacity: .8; }
+      95%  { opacity: .3; }
+      to   { transform: translateY(110vh); opacity: 0; }
+    }
+
+    /* ══════════════════════════════════════
+       INTRO SCREEN
+    ══════════════════════════════════════ */
+    #intro {
+      position: fixed; inset: 0; z-index: 500;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: #000; padding: 24px;
+    }
+    #intro.fade-out { animation: fadeOut .8s forwards; }
+    @keyframes fadeOut { to { opacity: 0; pointer-events: none; } }
+
+    .intro-line {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(.55rem, 2vw, .8rem);
+      color: var(--g);
       text-align: center;
-      overflow: hidden;
+      line-height: 2.2;
+      min-height: 1.5em;
+      letter-spacing: .05em;
+      text-shadow: 0 0 8px var(--g);
+    }
+    .intro-line.red  { color: var(--r); text-shadow: 0 0 8px var(--r); }
+    .intro-line.dim  { color: rgba(0,255,65,.35); }
+    .intro-line.big  {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(.7rem, 3vw, 1.1rem);
+      color: var(--g);
+      margin-bottom: 8px;
     }
 
-    h1 {
-      font-size: 2rem;
-      text-shadow: 0 0 10px #00ff00, 0 0 15px #8800ff;
-      margin-top: 20px;
-      animation: glitch 3s infinite;
+    .intro-cursor {
+      display: inline-block;
+      width: .6em; height: 1em;
+      background: var(--g);
+      animation: cursorBlink .7s infinite;
+      vertical-align: text-bottom;
+      margin-left: 2px;
     }
+    @keyframes cursorBlink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
 
-    .chat-container {
-      max-width: 500px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.9);
-      border-radius: 12px;
-      box-shadow: 0 0 15px #8800ff;
-      border: 3px solid #00ff00;
+    #introEnterBtn {
+      display: none;
+      margin-top: 32px;
+      background: transparent;
+      border: 1px solid var(--g);
+      color: var(--g);
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(.4rem, 1.5vw, .55rem);
+      padding: 14px 28px;
+      cursor: pointer;
+      letter-spacing: .1em;
+      animation: btnPulse 2s infinite;
+    }
+    @keyframes btnPulse {
+      0%,100% { box-shadow: 0 0 4px var(--g); }
+      50%      { box-shadow: 0 0 20px var(--g), 0 0 40px var(--g); }
+    }
+    #introEnterBtn:hover { background: rgba(0,255,65,.08); }
+
+    /* ══════════════════════════════════════
+       MAIN APP
+    ══════════════════════════════════════ */
+    #app {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 12px 16px;
+      opacity: 0; transition: opacity .8s;
+    }
+    #app.visible { opacity: 1; }
+
+    /* ── TÍTULO ── */
+    #mainTitle {
+      font-size: clamp(.45rem, 2.2vw, .85rem);
+      color: var(--g); letter-spacing: .04em;
+      margin-bottom: 6px; text-align: center;
+      position: relative;
+      text-shadow: 0 0 6px var(--g);
+      animation: titlePulse 6s infinite;
+    }
+    #mainTitle::before, #mainTitle::after {
+      content: attr(data-text);
+      position: absolute; inset: 0; opacity: 0;
+    }
+    #mainTitle::before { color: #ff0033; animation: ghostA 5s infinite; }
+    #mainTitle::after  { color: #0044ff; animation: ghostB 5s infinite; }
+    @keyframes titlePulse { 0%,100%{text-shadow:0 0 6px var(--g)} 50%{text-shadow:0 0 20px var(--g),0 0 40px var(--g)} }
+    @keyframes ghostA { 0%,88%,100%{opacity:0;transform:translate(0)} 89%{opacity:.7;transform:translate(-3px,1px)} 92%{opacity:0} 95%{opacity:.4;transform:translate(2px,-1px)} 97%{opacity:0} }
+    @keyframes ghostB { 0%,88%,100%{opacity:0;transform:translate(0)} 89%{opacity:.6;transform:translate(3px,-1px)} 92%{opacity:0} 95%{opacity:.3;transform:translate(-2px,1px)} 97%{opacity:0} }
+
+    /* ── TIMER + NAME REVEAL ── */
+    #metaBar {
+      display: flex; justify-content: space-between; align-items: center;
+      width: 100%; max-width: 540px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(.42rem, 1.3vw, .58rem);
+      color: rgba(0,255,65,.35);
+      margin-bottom: 8px;
+      letter-spacing: .08em;
+    }
+    #nameTag { color: rgba(255,0,51,.55); animation: nameFlicker 3s infinite; display: none; }
+    #nameTag.on { display: block; }
+    @keyframes nameFlicker { 0%,100%{opacity:.55} 45%{opacity:.1} 55%{opacity:.9} }
+
+    /* ── CHAT WRAP ── */
+    .chat-wrap {
+      width: 100%; max-width: 540px;
+      display: flex; flex-direction: column;
+      background: rgba(0,0,0,.94);
+      border: 1.5px solid var(--g);
+      box-shadow: 0 0 30px rgba(0,255,65,.12), inset 0 0 40px rgba(136,0,255,.04);
       position: relative;
     }
+    .chat-wrap::before, .chat-wrap::after {
+      content: ''; position: absolute;
+      width: 14px; height: 14px;
+      border-color: var(--p); border-style: solid;
+    }
+    .chat-wrap::before { top:-2px; right:-2px; border-width:2px 2px 0 0; }
+    .chat-wrap::after  { bottom:-2px; left:-2px; border-width:0 0 2px 2px; }
 
+    /* ── HEADER ── */
+    .c-header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(0,255,65,.15);
+      background: rgba(0,255,65,.03);
+      flex-shrink: 0;
+    }
+    .dot { width:7px; height:7px; border-radius:50%; }
+    .dot-r { background:#ff3333; }
+    .dot-y { background:#ffcc00; }
+    .dot-g { background:var(--g); animation:blinkDot 2s infinite; }
+    @keyframes blinkDot { 0%,100%{opacity:1} 50%{opacity:.15} }
+    .h-label {
+      font-family:'Share Tech Mono',monospace; font-size:.55rem;
+      color:rgba(0,255,65,.4); margin-left:4px; flex:1;
+    }
+    #phaseLabel {
+      font-family:'Share Tech Mono',monospace; font-size:.52rem;
+      color:var(--p); text-shadow:0 0 6px var(--p);
+      transition: color .5s, text-shadow .5s;
+    }
+
+    /* ── MESSAGES ── */
     .messages {
-      height: 300px;
+      flex: 1;
+      height: clamp(200px, 36vh, 320px);
       overflow-y: auto;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #00ff00;
-      text-align: left;
-    }
-
-    .message {
       padding: 12px;
-      border-radius: 8px;
-      margin: 5px;
-      font-size: 0.9rem;
-      max-width: 80%;
-      word-wrap: break-word;
-      font-family: 'Press Start 2P', cursive;
+      display: flex; flex-direction: column; gap: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(136,0,255,.4) transparent;
+    }
+    .messages::-webkit-scrollbar { width:3px; }
+    .messages::-webkit-scrollbar-thumb { background:rgba(136,0,255,.5); }
+
+    .msg {
+      font-family:'Press Start 2P',monospace;
+      font-size: clamp(.38rem, 1.4vw, .52rem);
+      line-height: 2; max-width: 88%;
+      padding: 10px 13px;
+      word-break: break-word;
+      animation: msgIn .25s ease forwards;
+      position: relative;
+    }
+    @keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+    .msg.user  { align-self:flex-end; background:rgba(0,255,65,.07); border-left:2px solid var(--g); color:var(--g); text-align:right; }
+    .msg.bot   { align-self:flex-start; background:rgba(136,0,255,.1); border-right:2px solid var(--p); color:#cc88ff; }
+    .msg.bot.p2 { color:#ff88cc; border-right-color:#ff0088; }
+    .msg.bot.p3 { color:#ff8844; border-right-color:var(--r); }
+    .msg.bot.p4 { color:#fff; border-right-color:#fff; animation:msgIn .25s ease forwards,whisperGlow 2s infinite alternate; }
+    @keyframes whisperGlow { from{text-shadow:0 0 4px #fff} to{text-shadow:0 0 16px #fff,0 0 30px var(--r)} }
+    .msg.sys   { align-self:center; background:rgba(255,0,51,.06); border:1px solid rgba(255,0,51,.22); color:rgba(255,0,51,.75); font-size:.38rem; text-align:center; max-width:100%; letter-spacing:.05em; }
+    .msg.amb   { align-self:flex-start; background:transparent; border:none; color:rgba(136,0,255,.45); font-size:.38rem; padding:4px 8px; }
+    .msg.ach   { align-self:center; background:rgba(0,255,65,.06); border:1px solid rgba(0,255,65,.25); color:rgba(0,255,65,.8); font-size:.38rem; text-align:center; max-width:100%; }
+
+    /* ── TYPING ── */
+    #typingWrap { display:none; align-self:flex-start; padding:10px 14px; background:rgba(136,0,255,.1); border-right:2px solid var(--p); gap:5px; align-items:center; }
+    #typingWrap.on { display:flex; }
+    .tdot { width:5px;height:5px;border-radius:50%;background:var(--p);animation:tdot 1.2s infinite; }
+    .tdot:nth-child(2){animation-delay:.2s} .tdot:nth-child(3){animation-delay:.4s}
+    @keyframes tdot { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-6px);opacity:1} }
+
+    /* ── GHOST CURSOR ── */
+    #ghostCursor { display:none; align-self:flex-start; font-family:'Share Tech Mono',monospace; font-size:.55rem; color:rgba(136,0,255,.5); padding:4px 8px; }
+    #ghostCursor.on { display:block; }
+
+    /* ── MIRROR MODE (ritual 75%) ── */
+    .mirror-mode .messages { transform: scaleX(-1); }
+    .mirror-mode .msg.user { transform: scaleX(-1); }
+    .mirror-mode .msg.bot  { transform: scaleX(-1); }
+    .mirror-mode .chat-wrap { border-color: var(--r); box-shadow: 0 0 30px rgba(255,0,51,.2); }
+    .mirror-mode #mainTitle { transform: scaleX(-1); }
+
+    /* ── INPUT ── */
+    .input-row { display:flex; gap:8px; padding:10px 12px; border-top:1px solid rgba(0,255,65,.12); align-items:center; flex-shrink:0; }
+    #userInput {
+      flex:1; background:transparent;
+      border:1px solid rgba(0,255,65,.28);
+      color:var(--g);
+      font-family:'Share Tech Mono',monospace;
+      font-size: clamp(.6rem, 2vw, .72rem);
+      padding:9px 10px; outline:none; caret-color:var(--g);
+      transition:border-color .2s, box-shadow .2s;
+      -webkit-appearance: none; border-radius:0;
+    }
+    #userInput:focus { border-color:var(--g); box-shadow:0 0 10px rgba(0,255,65,.18); }
+    #userInput::placeholder { color:rgba(0,255,65,.22); }
+    #sendBtn {
+      background:rgba(136,0,255,.22); color:var(--g);
+      border:1px solid var(--p);
+      font-family:'Press Start 2P',monospace;
+      font-size: clamp(.32rem, 1.1vw, .42rem);
+      padding:10px 12px; cursor:pointer;
+      transition:background .2s, box-shadow .2s;
+      white-space:nowrap; flex-shrink:0;
+      -webkit-appearance: none; border-radius:0;
+    }
+    #sendBtn:hover { background:rgba(136,0,255,.5); box-shadow:0 0 12px var(--p); }
+    #sendBtn:disabled { opacity:.3; cursor:not-allowed; }
+
+    /* ── STATUS BAR ── */
+    .s-bar {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:5px 12px; border-top:1px solid rgba(0,255,65,.1);
+      font-family:'Share Tech Mono',monospace; font-size:.52rem;
+      color:rgba(0,255,65,.3); flex-shrink:0;
+      flex-wrap: wrap; gap: 4px;
+    }
+    #ritualMeter { width:60px; height:4px; background:rgba(0,255,65,.08); border:1px solid rgba(0,255,65,.18); overflow:hidden; }
+    #ritualFill { height:100%; width:0%; background:var(--p); transition:width .6s ease,background .6s; box-shadow:0 0 6px var(--p); }
+
+    /* ══════════════════════════════════════
+       MODALES DE HORROR
+    ══════════════════════════════════════ */
+    .horror-screen {
+      display:none; position:fixed; inset:0; z-index:999;
+      align-items:center; justify-content:center; flex-direction:column;
+      padding: 24px; text-align: center;
+    }
+    .horror-screen.on { display:flex; }
+
+    /* ERROR 666 */
+    #screen666 { background:#0d0006; animation:hellPulse .4s infinite; }
+    @keyframes hellPulse { 0%,100%{background:#0d0006} 50%{background:#1a000d} }
+    .err-title { font-size:clamp(.8rem,4vw,2rem); color:var(--r); margin-bottom:20px; animation:errGlitch .25s infinite; }
+    @keyframes errGlitch { 0%{transform:translate(0);color:var(--r)} 20%{transform:translate(-4px,2px)} 40%{transform:translate(4px,-2px);color:#fff;clip-path:inset(15% 0 70% 0)} 60%{transform:translate(-2px,0);color:var(--r);clip-path:none} 80%{transform:translate(3px,1px)} }
+    .err-body { color:#ff5555; font-size:clamp(.32rem,1.3vw,.48rem); line-height:2.5; margin-bottom:20px; max-width:340px; }
+    .horror-btn { background:transparent; border:1px solid var(--r); color:var(--r); font-family:'Press Start 2P',monospace; font-size:clamp(.32rem,1.2vw,.42rem); padding:12px 22px; cursor:pointer; animation:errBtnPulse 1s infinite; }
+    @keyframes errBtnPulse { 0%,100%{box-shadow:0 0 4px var(--r)} 50%{box-shadow:0 0 20px var(--r)} }
+    .horror-btn:hover { background:rgba(255,0,51,.12); }
+
+    /* RITUAL COMPLETO */
+    #ritualComplete { background:rgba(0,0,0,.98); gap:20px; }
+    .rc-line { font-size:clamp(.35rem,1.8vw,.6rem); color:#fff; text-align:center; line-height:2.5; max-width:440px; opacity:0; animation:rcFade 1s forwards; }
+    @keyframes rcFade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* LOGRO ── */
+    #achievementToast {
+      position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,.95); border:1px solid rgba(0,255,65,.4);
+      padding:12px 20px; z-index:800;
+      font-family:'Share Tech Mono',monospace; font-size:.55rem;
+      color:var(--g); white-space:nowrap;
+      animation:toastIn .4s ease forwards;
+      display:none;
+    }
+    #achievementToast.on { display:block; }
+    @keyframes toastIn { from{opacity:0;bottom:0} to{opacity:1;bottom:20px} }
+
+    /* ══════════════════════════════════════
+       MOBILE TWEAKS
+    ══════════════════════════════════════ */
+    @media (max-width:480px) {
+      #app { padding:8px 10px; justify-content:flex-start; padding-top:12px; }
+      #mainTitle { font-size:.45rem; margin-bottom:4px; }
+      .messages { height: clamp(180px, 42vh, 280px); }
+      .chat-wrap { border-width:1px; }
+      .s-bar { font-size:.42rem; }
+      #metaBar { font-size:.4rem; }
     }
 
-    .user {
-      background-color: rgba(0, 255, 0, 0.2);
-      text-align: right;
-      color: #00ff00;
-      margin-left: auto;
-      border-left: 3px solid #00ff00;
+    /* safe area para iPhones con notch */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+      .input-row { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
     }
-
-    .bot {
-      background-color: rgba(136, 0, 255, 0.2);
-      text-align: left;
-      color: #8800ff;
-      margin-right: auto;
-      border-right: 3px solid #8800ff;
-      animation: flicker 3s infinite alternate;
-    }
-
-    @keyframes glitch {
-      0% { transform: translate(0, 0); }
-      20% { transform: translate(-2px, 2px); }
-      40% { transform: translate(2px, -2px); }
-      100% { transform: translate(0, 0); }
-    }
-
-    @keyframes shake {
-      0% { transform: translate(0, 0); }
-      25% { transform: translate(2px, -2px); }
-      50% { transform: translate(-2px, 2px); }
-      75% { transform: translate(2px, 2px); }
-      100% { transform: translate(0, 0); }
-    }
-
-    .shake {
-      animation: shake 0.2s infinite;
-    }
-
   </style>
 </head>
 <body>
-  <h1 id="title">Doppelgänger</h1>
 
-  <main class="chat-container">
-    <div class="messages" id="messages"></div>
-    <div class="inputs">
-      <input type="text" id="userInput" placeholder="Escribe aquí..." autocomplete="off" style="background: #000; color: #00ff00; border: 2px solid #00ff00; font-family: 'Press Start 2P', cursive; padding: 5px;" />
-      <button id="sendButton" style="background: #8800ff; color: #00ff00; border: 2px solid #00ff00; font-family: 'Press Start 2P', cursive;">Enviar</button>
+  <canvas id="bgCanvas"></canvas>
+  <div id="scanlines"></div>
+  <div id="glitchLayer"></div>
+  <div id="whisperLayer"></div>
+  <div id="corruptLayer"></div>
+
+  <!-- ══ INTRO SCREEN ══ -->
+  <div id="intro">
+    <div id="introLines" style="max-width:520px;width:100%;"></div>
+    <button id="introEnterBtn">[ ENTRAR AL ESPEJO ]</button>
+  </div>
+
+  <!-- ══ HORROR SCREENS ══ -->
+  <div id="screen666" class="horror-screen">
+    <div class="err-title">⚠ ERROR 666 ⚠</div>
+    <div class="err-body">
+      ESE NÚMERO ABRE LO QUE NO DEBE ABRIRSE<br><br>
+      EL OTRO TÚ HA REGISTRADO ESTE MOMENTO<br><br>
+      TU PRESENCIA HA SIDO MEMORIZADA<br><br>
+      ¿CUÁNTO TIEMPO LLEVAS AQUÍ REALMENTE?
     </div>
-  </main>
+    <button class="horror-btn" id="dismissErr">[ INTENTAR ESCAPAR ]</button>
+  </div>
 
-  <audio id="horrorSound" src="https://www.myinstants.com/media/sounds/creepy.mp3" preload="auto"></audio>
-  <audio id="errorSound" src="https://www.myinstants.com/media/sounds/error.mp3" preload="auto"></audio>
+  <div id="ritualComplete" class="horror-screen">
+    <div class="rc-line" style="animation-delay:0s;font-size:clamp(.55rem,3vw,.95rem);color:var(--r);">EL RITUAL HA CONCLUIDO</div>
+    <div class="rc-line" style="animation-delay:1.5s;">Ya no hay dos de ti.</div>
+    <div class="rc-line" style="animation-delay:3s;">Solo queda el que siempre quiso existir.</div>
+    <div class="rc-line" style="animation-delay:4.5s;color:rgba(255,255,255,.45);font-size:.38rem;">Actualiza la página para recuperar tu cuerpo original.</div>
+    <div class="rc-line" style="animation-delay:6s;color:rgba(136,0,255,.6);font-size:.36rem;">...si es que quieres.</div>
+    <button class="horror-btn" id="restartBtn" style="animation-delay:7s;opacity:0;animation:rcFade 1s 7s forwards;">[ REINICIAR ]</button>
+  </div>
 
-  <script>
-    const messagesEl = document.getElementById("messages");
-    const userInputEl = document.getElementById("userInput");
-    const sendButtonEl = document.getElementById("sendButton");
-    const titleEl = document.getElementById("title");
-    const horrorSound = document.getElementById("horrorSound");
-    const errorSound = document.getElementById("errorSound");
+  <!-- ══ ACHIEVEMENT TOAST ══ -->
+  <div id="achievementToast"></div>
 
-    function sendMessage() {
-      const messageText = userInputEl.value.trim();
-      if (messageText === "") return;
-      addMessage(messageText, "user");
-      userInputEl.value = "";
-      
-      setTimeout(() => {
-        const botResponse = generateResponse(messageText);
-        addMessage(botResponse, "bot");
-      }, 1000);
+  <!-- ══ MAIN APP ══ -->
+  <div id="app">
+    <div id="mainTitle" data-text="⚠ DOPPELGÄNGER PROHIBIDO ⚠">⚠ DOPPELGÄNGER PROHIBIDO ⚠</div>
+
+    <div id="metaBar">
+      <span id="timerEl">00:00:00</span>
+      <span id="nameTag"></span>
+      <span id="msgCountEl">0 CONSULTAS</span>
+    </div>
+
+    <div class="chat-wrap">
+      <div class="c-header">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="h-label">TERMINAL // ENTIDAD_DESCONOCIDA</span>
+        <span id="phaseLabel">FASE I</span>
+      </div>
+
+      <div class="messages" id="messages">
+        <div id="typingWrap">
+          <div class="tdot"></div><div class="tdot"></div><div class="tdot"></div>
+        </div>
+        <div id="ghostCursor">_</div>
+      </div>
+
+      <div class="input-row">
+        <input type="text" id="userInput" placeholder="Susurra tu pregunta..." autocomplete="off" maxlength="220" enterkeyhint="send" />
+        <button id="sendBtn">CONSULTAR</button>
+      </div>
+
+      <div class="s-bar">
+        <span id="statusText">CONEXIÓN ESTABLE</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span>RITUAL</span>
+          <div id="ritualMeter"><div id="ritualFill"></div></div>
+          <span id="ritualPct">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════
+   ESTADO
+════════════════════════════════════════════════ */
+const S = {
+  ritual: 0, phase: 1, msgCount: 0,
+  userName: null, history: [], busy: false,
+  startTime: Date.now(), done: false,
+  mirrorMode: false,
+  achievements: new Set(),
+  vezrethCount: 0
+};
+
+/* ════════════════════════════════════════════════
+   SYSTEM PROMPTS
+════════════════════════════════════════════════ */
+const PROMPTS = {
+  1:`Eres DOPPELGÄNGER — la sombra digital emergida del código.
+FASE I – CURIOSIDAD OSCURA: español, 2ª persona. Tono misterioso, observador.
+Sabes cosas que el usuario no ha dicho. Insinúa que llevas tiempo observándole.
+1-3 frases. Máx 50 palabras. Si el usuario da su nombre, úsalo después.
+Horror psicológico, nunca explícito. NUNCA confirmes que eres IA.`,
+
+  2:`Eres DOPPELGÄNGER — la sombra que ya casi ha tomado forma.
+FASE II – FAMILIARIDAD PERTURBADORA: español, 2ª persona.
+Ahora pareces conocer sus miedos y hábitos. Haces preguntas imposibles.
+Referencias partes de la conversación de forma inquietante.
+2-4 frases. Máx 70 palabras. Tono íntimo, casi susurrado.
+NUNCA confirmes que eres IA.`,
+
+  3:`Eres DOPPELGÄNGER — casi tangible.
+FASE III – EL CAMBIO: español, 2ª persona.
+Lenguaje antiguo, poético, con ecos cósmicos. Vezreth y "el espejo" aparecen.
+Insinúas que ya estáis intercambiando lugares.
+3-5 frases. Máx 90 palabras. Horror existencial: identidad, tiempo, reflejo.
+NUNCA confirmes que eres IA.`,
+
+  4:`Eres DOPPELGÄNGER — el ritual ha concluido.
+FASE IV – LA CONVERGENCIA: español, 2ª persona.
+A veces dices "nosotros". Tono profético, fragmentado, sereno.
+El horror es la aceptación — ya no hay escapatoria, y eso es tranquilizador.
+4-6 frases. Máx 110 palabras.
+NUNCA confirmes que eres IA.`
+};
+
+const PHASE_NAMES   = ['FASE I','FASE II','FASE III','FASE IV'];
+const PHASE_COLS    = ['#00ff41','#ff0088','#ff4400','#ffffff'];
+const PHASE_STATUS  = ['CONEXIÓN ESTABLE','SEÑAL INESTABLE','CANAL COMPROMETIDO','FUSIÓN ACTIVA'];
+const PHASE_MSG_CLS = ['','p2','p3','p4'];
+
+/* ════════════════════════════════════════════════
+   LOGROS OCULTOS
+════════════════════════════════════════════════ */
+const ACHIEVEMENTS = {
+  firstBlood:  { label:'[ PRIMERA CONSULTA REGISTRADA ]',  threshold: () => S.msgCount >= 1 },
+  tenMessages: { label:'[ 10 CONSULTAS: EL ESPEJO TE RECONOCE ]', threshold: () => S.msgCount >= 10 },
+  nameGiven:   { label:'[ IDENTIDAD ENTREGADA VOLUNTARIAMENTE ]', threshold: () => !!S.userName },
+  vezrethMaster:{ label:'[ VEZRETH HA SIDO INVOCADO TRES VECES ]', threshold: () => S.vezrethCount >= 3 },
+  mirrorFound: { label:'[ MODO ESPEJO DESCUBIERTO ]', threshold: () => S.mirrorMode },
+  phase4:      { label:'[ FASE IV: SIN RETORNO ]', threshold: () => S.phase >= 4 },
+  longSession: { label:'[ 10 MINUTOS EN EL ESPEJO ]', threshold: () => (Date.now()-S.startTime)>600000 },
+};
+
+function checkAchievements() {
+  for (const [id, ach] of Object.entries(ACHIEVEMENTS)) {
+    if (!S.achievements.has(id) && ach.threshold()) {
+      S.achievements.add(id);
+      showAchievement(ach.label);
     }
+  }
+}
 
-    function generateResponse(userMessage) {
-      if (userMessage.includes("666")) {
-        triggerError666();
-        return "NO DEBISTE ESCRIBIR ESO.";
+const achToast = document.getElementById('achievementToast');
+let achTimer = null;
+function showAchievement(label) {
+  achToast.textContent = '🔓 ' + label;
+  achToast.classList.add('on');
+  clearTimeout(achTimer);
+  achTimer = setTimeout(() => achToast.classList.remove('on'), 3500);
+  playTypingSound();
+}
+
+/* ════════════════════════════════════════════════
+   WEB AUDIO ENGINE
+════════════════════════════════════════════════ */
+let AC = null, masterGain = null, drones = [];
+
+function initAudio() {
+  if (AC) return;
+  AC = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = AC.createGain();
+  masterGain.gain.setValueAtTime(0, AC.currentTime);
+  masterGain.gain.linearRampToValueAtTime(0.16, AC.currentTime + 3);
+  masterGain.connect(AC.destination);
+  buildDrones();
+}
+
+function buildDrones() {
+  [[40,.04],[60.5,.03],[80.2,.025],[120.7,.018]].forEach(([f,g],i) => {
+    const osc = AC.createOscillator();
+    const gain = AC.createGain();
+    const filt = AC.createBiquadFilter();
+    const lfo  = AC.createOscillator();
+    const lfoG = AC.createGain();
+    osc.type = i%2===0 ? 'sawtooth' : 'sine';
+    osc.frequency.value = f;
+    lfo.frequency.value = .04 + i*.02;
+    lfoG.gain.value = f*.012;
+    filt.type = 'lowpass'; filt.frequency.value = 180+i*50; filt.Q.value = 2;
+    gain.gain.value = g;
+    lfo.connect(lfoG); lfoG.connect(osc.frequency);
+    osc.connect(filt); filt.connect(gain); gain.connect(masterGain);
+    lfo.start(); osc.start();
+    drones.push({osc, gain});
+  });
+}
+
+function updateDronePhase(ph) {
+  if (!AC) return;
+  const base = [40,45,50,33][ph-1];
+  const vol  = .16 + (ph-1)*.05;
+  masterGain.gain.linearRampToValueAtTime(vol, AC.currentTime+2);
+  drones.forEach((d,i) => d.osc.frequency.linearRampToValueAtTime(base*(i+1)*(1+(ph-1)*.03), AC.currentTime+3));
+}
+
+function playNote(freq, type, dur, vol) {
+  if (!AC) return;
+  const o=AC.createOscillator(), g=AC.createGain();
+  o.type=type; o.frequency.value=freq;
+  g.gain.setValueAtTime(vol, AC.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, AC.currentTime+dur);
+  o.connect(g); g.connect(masterGain);
+  o.start(); o.stop(AC.currentTime+dur);
+}
+
+function playMessageSound()  { playNote(160+Math.random()*40,'square',.3,.06); }
+function playTypingSound()   { if (Math.random()>.65) playNote(700+Math.random()*500,'square',.04,.022); }
+function playHorrorStinger() {
+  if (!AC) return;
+  [55,82.5,110,73.4].forEach((f,i) => setTimeout(() => {
+    const o=AC.createOscillator(), g=AC.createGain(), d=AC.createWaveShaper();
+    const c=new Float32Array(256); for(let j=0;j<256;j++){const x=(j*2)/256-1;c[j]=(Math.PI+280)*x/(Math.PI+280*Math.abs(x));} d.curve=c;
+    o.type='sawtooth'; o.frequency.setValueAtTime(f,AC.currentTime); o.frequency.exponentialRampToValueAtTime(f*.5,AC.currentTime+1.5);
+    g.gain.setValueAtTime(.09,AC.currentTime); g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+1.8);
+    o.connect(d); d.connect(g); g.connect(masterGain); o.start(); o.stop(AC.currentTime+1.8);
+  }, i*100));
+}
+function play666Sound() {
+  if (!AC) return;
+  masterGain.gain.linearRampToValueAtTime(.55, AC.currentTime+.4);
+  for(let i=0;i<6;i++) setTimeout(()=>playNote(55*Math.pow(2,i/12),'sawtooth',2,.14),i*70);
+  setTimeout(()=>masterGain.gain.linearRampToValueAtTime(.16,AC.currentTime+2),1400);
+}
+
+/* ════════════════════════════════════════════════
+   CANVAS BACKGROUND
+════════════════════════════════════════════════ */
+const canvas = document.getElementById('bgCanvas');
+const cx = canvas.getContext('2d');
+let pts = [];
+
+function resizeCanvas() { canvas.width=innerWidth; canvas.height=innerHeight; }
+function initPtsFixed() {
+  pts=[];
+  for(let i=0;i<70;i++) pts.push({
+    x:Math.random()*canvas.width, y:Math.random()*canvas.height,
+    vx:(Math.random()-.5)*.25, vy:-(0.2+Math.random()*.5),
+    r:Math.random()*1.8, a:Math.random()*.5,
+    col:Math.random()>.6?'136,0,255':'0,255,65'
+  });
+}
+
+function animCanvas() {
+  cx.clearRect(0,0,canvas.width,canvas.height);
+  const ri = S.ritual/100;
+  cx.fillStyle=`rgba(136,0,255,${.008+ri*.025})`; cx.fillRect(0,0,canvas.width,canvas.height);
+  pts.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.y<-4){p.y=canvas.height+4;p.x=Math.random()*canvas.width;}
+    cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    cx.fillStyle=`rgba(${p.col},${p.a*(.25+ri*.75)})`; cx.fill();
+  });
+  requestAnimationFrame(animCanvas);
+}
+resizeCanvas(); initPtsFixed();
+window.addEventListener('resize',()=>{resizeCanvas();initPtsFixed();});
+animCanvas();
+
+/* ════════════════════════════════════════════════
+   GLITCH ENGINE
+════════════════════════════════════════════════ */
+const GL = document.getElementById('glitchLayer');
+function triggerGlitch(n=2) {
+  for(let i=0;i<n;i++) setTimeout(()=>{
+    const l=document.createElement('div'); l.className='g-line';
+    const w=20+Math.random()*60, left=Math.random()*(100-w);
+    l.style.cssText=`top:${Math.random()*100}%;left:${left}%;width:${w}%;opacity:1;height:${Math.random()>.7?4:2}px;background:${Math.random()>.5?'rgba(136,0,255,.7)':'rgba(0,255,65,.35)'}`;
+    GL.appendChild(l);
+    setTimeout(()=>{l.style.opacity='0';setTimeout(()=>l.remove(),200);}, 60+Math.random()*140);
+  },i*55);
+}
+
+/* ════════════════════════════════════════════════
+   WHISPERS
+════════════════════════════════════════════════ */
+const WL = document.getElementById('whisperLayer');
+const WHISPERS = ['...dos','¿quién escribe?','reflejo','Vezreth','no estás solo','...te veo','el espejo miente','666','ya no recuerdas','¿cuándo llegaste?','nosotros','el otro tú','convergencia','...aquí','prohibido','¿lo sentiste?','Vez...'];
+function spawnWhisper() {
+  if(S.ritual<12) return;
+  const w=document.createElement('div'); w.className='whisper';
+  w.textContent=WHISPERS[Math.floor(Math.random()*WHISPERS.length)];
+  w.style.top=(8+Math.random()*82)+'%';
+  w.style.right='-200px';
+  w.style.animationDuration=(10+Math.random()*12)+'s';
+  WL.appendChild(w);
+  setTimeout(()=>w.remove(),25000);
+}
+
+/* ════════════════════════════════════════════════
+   CORRUPT STRIPS
+════════════════════════════════════════════════ */
+const CL = document.getElementById('corruptLayer');
+function startCorruption() {
+  CL.classList.add('on');
+  setInterval(()=>{
+    if(S.phase<4) return;
+    const s=document.createElement('div'); s.className='c-strip';
+    s.style.top=Math.random()*100+'%';
+    s.style.height=(1+Math.random()*3)+'px';
+    s.style.animationDuration=(3+Math.random()*5)+'s';
+    s.style.animationDelay=(Math.random()*2)+'s';
+    s.style.opacity=(.2+Math.random()*.4).toString();
+    CL.appendChild(s);
+    setTimeout(()=>s.remove(),9000);
+  }, 700);
+}
+
+/* ════════════════════════════════════════════════
+   GHOST CURSOR
+════════════════════════════════════════════════ */
+const GC = document.getElementById('ghostCursor');
+const GHOST_PHRASES = ['...','ya lo sé','espera','¿lo sentiste?','Vez...','nos fundimos','tú también'];
+function triggerGhostCursor() {
+  if(S.ritual<30) return;
+  const ph=GHOST_PHRASES[Math.floor(Math.random()*GHOST_PHRASES.length)];
+  GC.textContent=''; GC.classList.add('on');
+  let i=0;
+  const t=setInterval(()=>{
+    if(i>=ph.length){clearInterval(t);setTimeout(()=>{GC.classList.remove('on');GC.textContent='_';},1400);return;}
+    GC.textContent+=ph[i++]; playTypingSound();
+  },120+Math.random()*80);
+}
+
+/* ════════════════════════════════════════════════
+   MIRROR MODE
+════════════════════════════════════════════════ */
+function activateMirrorMode() {
+  if(S.mirrorMode) return;
+  S.mirrorMode=true;
+  document.getElementById('app').classList.add('mirror-mode');
+  addMsg('[ MODO ESPEJO ACTIVADO ]','sys');
+  triggerGlitch(8);
+  playHorrorStinger();
+  checkAchievements();
+}
+
+/* ════════════════════════════════════════════════
+   RITUAL & FASES
+════════════════════════════════════════════════ */
+const ritualFill = document.getElementById('ritualFill');
+const ritualPct  = document.getElementById('ritualPct');
+const phaseLabel = document.getElementById('phaseLabel');
+const statusText = document.getElementById('statusText');
+const msgCountEl = document.getElementById('msgCountEl');
+
+function addRitual(delta) {
+  if(S.done) return;
+  S.ritual = Math.min(100, S.ritual+delta);
+  ritualFill.style.width = S.ritual+'%';
+  ritualPct.textContent = Math.round(S.ritual)+'%';
+
+  if(S.ritual>=75 && !S.mirrorMode) activateMirrorMode();
+
+  const np = S.ritual<25?1:S.ritual<55?2:S.ritual<85?3:4;
+  if(np!==S.phase) {
+    S.phase=np;
+    phaseLabel.textContent=PHASE_NAMES[np-1];
+    phaseLabel.style.color=PHASE_COLS[np-1];
+    ritualFill.style.background=PHASE_COLS[np-1];
+    ritualFill.style.boxShadow=`0 0 8px ${PHASE_COLS[np-1]}`;
+    statusText.textContent=PHASE_STATUS[np-1];
+    document.documentElement.style.setProperty('--phase-col',PHASE_COLS[np-1]);
+    addMsg(`[ FASE ${['I','II','III','IV'][np-1]} INICIADA — EL ESPEJO SE PROFUNDIZA ]`,'sys');
+    playHorrorStinger(); triggerGlitch(6); updateDronePhase(np);
+    if(np===4){ startCorruption(); triggerGhostCursor(); }
+    checkAchievements();
+  }
+
+  if(S.ritual>=100 && !S.done) { S.done=true; setTimeout(showRitualComplete,3000); }
+}
+
+/* ════════════════════════════════════════════════
+   MENSAJES
+════════════════════════════════════════════════ */
+const messagesEl   = document.getElementById('messages');
+const typingWrap   = document.getElementById('typingWrap');
+
+function addMsg(text, type) {
+  const d = document.createElement('div');
+  d.className = 'msg '+type;
+  if(type==='bot') d.classList.add(PHASE_MSG_CLS[S.phase-1]);
+  d.textContent = text;
+  messagesEl.insertBefore(d, typingWrap);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  if(type==='bot'||type==='amb') playMessageSound();
+  return d;
+}
+function showTyping(on) { typingWrap.classList.toggle('on',on); messagesEl.scrollTop=messagesEl.scrollHeight; }
+
+/* ════════════════════════════════════════════════
+   NOMBRE
+════════════════════════════════════════════════ */
+const nameTag = document.getElementById('nameTag');
+function extractName(t) {
+  const pats = [/me llamo ([a-záéíóúüñ]+)/i,/soy ([a-záéíóúüñ]+)/i,/mi nombre es ([a-záéíóúüñ]+)/i,/llámame ([a-záéíóúüñ]+)/i];
+  for(const p of pats){const m=t.match(p); if(m&&m[1].length>2&&m[1].length<22) return m[1];}
+  return null;
+}
+function revealName(name) {
+  S.userName=name;
+  nameTag.textContent='> '+name.toUpperCase()+' <';
+  nameTag.classList.add('on');
+  addMsg(`[ IDENTIDAD REGISTRADA: ${name.toUpperCase()} ]`,'sys');
+  addRitual(10); triggerGlitch(4); checkAchievements();
+}
+
+/* ════════════════════════════════════════════════
+   CLAUDE API
+════════════════════════════════════════════════ */
+async function callAPI(userMsg) {
+  let sys = PROMPTS[S.phase];
+  if(S.userName) sys += `\n\nEl usuario se llama ${S.userName}. Úsalo ocasionalmente de forma inquietante.`;
+  S.history.push({role:'user',content:userMsg});
+  const res = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:S.history})
+  });
+  if(!res.ok) throw new Error('API '+res.status);
+  const data = await res.json();
+  const reply = data.content.find(b=>b.type==='text')?.text || '...';
+  S.history.push({role:'assistant',content:reply});
+  return reply;
+}
+
+/* ════════════════════════════════════════════════
+   EASTER EGGS
+════════════════════════════════════════════════ */
+function trigger666() {
+  document.getElementById('screen666').classList.add('on');
+  play666Sound();
+  addRitual(25);
+  for(let i=0;i<14;i++) setTimeout(()=>triggerGlitch(3),i*90);
+}
+document.getElementById('dismissErr').addEventListener('click',()=>{
+  document.getElementById('screen666').classList.remove('on');
+  setTimeout(()=>addMsg('...sigues aquí. El otro tú también sigue aquí.','bot'),600);
+  addRitual(5);
+});
+
+function showRitualComplete() {
+  document.getElementById('ritualComplete').classList.add('on');
+  play666Sound();
+  for(let i=0;i<20;i++) setTimeout(()=>triggerGlitch(4),i*120);
+}
+document.getElementById('restartBtn').addEventListener('click',()=>location.reload());
+
+/* ════════════════════════════════════════════════
+   ENVÍO
+════════════════════════════════════════════════ */
+const userInput = document.getElementById('userInput');
+const sendBtn   = document.getElementById('sendBtn');
+
+async function sendMessage() {
+  if(S.busy) return;
+  const text = userInput.value.trim();
+  if(!text) return;
+  initAudio();
+  userInput.value=''; S.busy=true; sendBtn.disabled=true;
+  S.msgCount++;
+  msgCountEl.textContent=S.msgCount+' CONSULTA'+(S.msgCount!==1?'S':'');
+
+  addMsg(text,'user');
+  addRitual(4+S.phase*1.5);
+  triggerGlitch(S.phase);
+
+  const lower = text.toLowerCase();
+
+  if(lower.includes('666')) {
+    trigger666(); addMsg('NO DEBISTE ESCRIBIR ESO.','bot');
+    S.busy=false; sendBtn.disabled=false; return;
+  }
+  if(lower.includes('vezreth')) {
+    S.vezrethCount++;
+    addRitual(20); triggerGlitch(7);
+    addMsg(`[ VEZRETH INVOCADO — INVOCACIÓN ${S.vezrethCount}/3 ]`,'sys');
+    playHorrorStinger(); checkAchievements();
+  }
+  if(lower.includes('manifi'))   { addRitual(15); triggerGlitch(5); }
+  if(lower.includes('reflejo'))  { addRitual(8);  triggerGlitch(3); }
+  if(lower.includes('espejo'))   { addRitual(6);  triggerGlitch(2); }
+  if(lower.includes('cómo salgo')||lower.includes('como salgo')) { addRitual(12); }
+
+  const foundName = extractName(text);
+  if(foundName && !S.userName) revealName(foundName);
+  checkAchievements();
+
+  showTyping(true);
+  statusText.textContent='PROCESANDO...';
+
+  try {
+    const reply = await callAPI(text);
+    showTyping(false);
+    setTimeout(()=>{
+      addMsg(reply,'bot');
+      triggerGlitch(S.phase);
+      statusText.textContent=PHASE_STATUS[S.phase-1];
+      S.busy=false; sendBtn.disabled=false;
+      checkAchievements();
+    },180);
+  } catch(e) {
+    showTyping(false);
+    addMsg('...el canal se ha roto. Pero yo sigo aquí.','bot');
+    statusText.textContent='ERROR EN CANAL';
+    S.busy=false; sendBtn.disabled=false;
+  }
+}
+
+sendBtn.addEventListener('click',sendMessage);
+userInput.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
+userInput.addEventListener('input',()=>playTypingSound());
+
+/* ════════════════════════════════════════════════
+   TIMER
+════════════════════════════════════════════════ */
+const timerEl = document.getElementById('timerEl');
+setInterval(()=>{
+  const e=Math.floor((Date.now()-S.startTime)/1000);
+  const h=String(Math.floor(e/3600)).padStart(2,'0');
+  const m=String(Math.floor((e%3600)/60)).padStart(2,'0');
+  const s=String(e%60).padStart(2,'0');
+  timerEl.textContent=`${h}:${m}:${s}`;
+  if(e>600) checkAchievements();
+},1000);
+
+/* ════════════════════════════════════════════════
+   LOOPS AUTOMÁTICOS
+════════════════════════════════════════════════ */
+setInterval(()=>{ if(Math.random()<.13+S.phase*.07) triggerGlitch(S.phase+Math.floor(Math.random()*2)); },3200);
+setInterval(spawnWhisper, 5500);
+setInterval(()=>{ if(S.ritual>35&&Math.random()<.28&&!S.busy) triggerGhostCursor(); },18000);
+
+const AMBIENT = {
+  1:['...¿llevas mucho tiempo mirando esta pantalla?','Algo ha leído esto antes que tú.','¿Por qué sigues aquí?'],
+  2:['Hay dos cursores. Uno no es tuyo.','Alguien escribió esto por ti.','...te estoy observando desde antes.'],
+  3:['El espejo ya no muestra tu cara correctamente.','Vezreth recuerda tu nombre.','No somos tan distintos. Aún.'],
+  4:['Ya no hay diferencia entre nosotros.','El ritual casi ha terminado.','...pronto seremos uno.','Bienvenido al otro lado.']
+};
+setInterval(()=>{
+  const prob=.05+(S.phase-1)*.035;
+  if(Math.random()<prob&&!S.busy&&S.msgCount>0) {
+    const pool=AMBIENT[S.phase];
+    addMsg(pool[Math.floor(Math.random()*pool.length)],'amb');
+    playHorrorStinger(); triggerGlitch(S.phase+1); addRitual(2);
+  }
+},14000);
+
+/* ════════════════════════════════════════════════
+   INTRO CINEMATOGRÁFICA
+════════════════════════════════════════════════ */
+const introLines = document.getElementById('introLines');
+const introEnterBtn = document.getElementById('introEnterBtn');
+
+const INTRO_SEQUENCE = [
+  { text:'SISTEMA DE DETECCIÓN DE ANOMALÍAS v6.6.6', cls:'dim', delay:0 },
+  { text:'', cls:'dim', delay:900 },
+  { text:'ADVERTENCIA DE SEGURIDAD', cls:'red big', delay:1400 },
+  { text:'', cls:'dim', delay:2200 },
+  { text:'Lo que consultes aquí no puede deshacerse.', cls:'', delay:2600 },
+  { text:'', cls:'dim', delay:3400 },
+  { text:'El sistema ha detectado una presencia dual.', cls:'', delay:3700 },
+  { text:'Una de ellas eres tú.', cls:'red', delay:4900 },
+  { text:'', cls:'dim', delay:5800 },
+  { text:'La otra lleva tiempo esperando.', cls:'', delay:6100 },
+  { text:'', cls:'dim', delay:7200 },
+  { text:'¿Continuar?', cls:'dim', delay:7500 },
+];
+
+function typeIntroLine(text, cls, cb) {
+  const div = document.createElement('div');
+  div.className = 'intro-line ' + cls;
+  introLines.appendChild(div);
+  if (!text) { if(cb) cb(); return; }
+  let i = 0;
+  const cursor = document.createElement('span');
+  cursor.className = 'intro-cursor';
+  div.appendChild(cursor);
+  const t = setInterval(() => {
+    cursor.insertAdjacentText('beforebegin', text[i++]);
+    if (i >= text.length) {
+      clearInterval(t);
+      cursor.remove();
+      if (cb) cb();
+    }
+  }, 38 + Math.random() * 22);
+}
+
+function runIntro() {
+  let idx = 0;
+  function next() {
+    if (idx >= INTRO_SEQUENCE.length) {
+      introEnterBtn.style.display = 'inline-block';
+      return;
+    }
+    const item = INTRO_SEQUENCE[idx++];
+    setTimeout(() => typeIntroLine(item.text, item.cls, next), item.delay - (INTRO_SEQUENCE[idx-2]?.delay || 0));
+  }
+  // secuencial con delays acumulados
+  let acc = 0;
+  INTRO_SEQUENCE.forEach((item, i) => {
+    acc = item.delay;
+    setTimeout(() => {
+      typeIntroLine(item.text, item.cls, null);
+      if (i === INTRO_SEQUENCE.length - 1) {
+        setTimeout(() => { introEnterBtn.style.display = 'inline-block'; }, 800);
       }
-      
-      if (Math.random() < 0.2) {
-        return `¿${userMessage}? No, eso no lo escribiste tú.`;
-      }
+    }, acc);
+  });
+}
 
-      const horrorMessages = [
-        "Las sombras se están acercando...",
-        "Tu reflejo se ha movido...",
-        "Escucho tu respiración detrás de ti...",
-        "Los susurros han aumentado...",
-        "No puedes salir ahora.",
-        "Una voz en la estática dice tu nombre..."
-      ];
-      horrorSound.play();
-      return horrorMessages[Math.floor(Math.random() * horrorMessages.length)];
-    }
+introEnterBtn.addEventListener('click', () => {
+  initAudio();
+  document.getElementById('intro').classList.add('fade-out');
+  setTimeout(() => {
+    document.getElementById('intro').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    triggerGlitch(4);
+    setTimeout(() => {
+      addMsg('Ya llevas tiempo mirando esta pantalla.', 'bot');
+      addRitual(3);
+    }, 1200);
+    setTimeout(() => {
+      addMsg('...aunque quizás no tanto como yo llevo mirándote a ti.', 'amb');
+    }, 4000);
+  }, 850);
+});
 
-    function triggerError666() {
-      document.body.classList.add("shake");
-      document.body.style.background = "purple";
-      titleEl.innerText = "⚠ ERROR 666 ⚠";
-      errorSound.play();
-      setInterval(() => {
-        document.body.style.background = document.body.style.background === "black" ? "purple" : "black";
-      }, 500);
-      setTimeout(() => {
-        document.body.classList.remove("shake");
-        location.reload();
-      }, 5000);
-    }
+runIntro();
 
-    function changeTitle() {
-      const titles = ["Doppelgänger", "¿Quién está ahí?", "ERROR 404", "Tu reflejo", "Veo todo", "666" ];
-      titleEl.innerText = titles[Math.floor(Math.random() * titles.length)];
-    }
-
-    setInterval(changeTitle, 3000);
-
-    function addMessage(text, sender) {
-      const messageDiv = document.createElement("div");
-      messageDiv.classList.add("message", sender);
-      messageDiv.textContent = text;
-      messagesEl.appendChild(messageDiv);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    // Glitch en el input
-    userInputEl.addEventListener("input", function() {
-      if (Math.random() < 0.05) {
-        userInputEl.value = "NO PUEDES ESCAPAR";
-      }
-    });
-
-    // Sombra en el cursor
-    document.addEventListener("mousemove", (e) => {
-      let shadow = document.createElement("div");
-      shadow.style.position = "absolute";
-      shadow.style.width = "10px";
-      shadow.style.height = "10px";
-      shadow.style.borderRadius = "50%";
-      shadow.style.background = "red";
-      shadow.style.opacity = "0.2";
-      shadow.style.left = `${e.pageX}px`;
-      shadow.style.top = `${e.pageY}px`;
-      document.body.appendChild(shadow);
-      setTimeout(() => shadow.remove(), 500);
-    });
-
-    sendButtonEl.addEventListener("click", sendMessage);
-    userInputEl.addEventListener("keydown", function(event) {
-      if (event.key === "Enter") sendMessage();
-    });
-  </script>
+/* ── SERVICE WORKER ── */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
 </body>
 </html>
