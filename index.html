@@ -245,9 +245,9 @@
 
     .msg {
       font-family:var(--font-pixel);
-      font-size: clamp(.38rem, 1.4vw, .52rem);
-      line-height: 2; max-width: 88%;
-      padding: 10px 13px;
+      font-size: clamp(.72rem, 2.1vw, .95rem);
+      line-height: 1.75; max-width: 92%;
+      padding: 12px 15px;
       word-break: break-word;
       animation: msgIn .25s ease forwards;
       position: relative;
@@ -260,9 +260,9 @@
     .msg.bot.p3 { color:#ff8844; border-right-color:var(--r); }
     .msg.bot.p4 { color:#fff; border-right-color:#fff; animation:msgIn .25s ease forwards,whisperGlow 2s infinite alternate; }
     @keyframes whisperGlow { from{text-shadow:0 0 4px #fff} to{text-shadow:0 0 16px #fff,0 0 30px var(--r)} }
-    .msg.sys   { align-self:center; background:rgba(255,0,51,.06); border:1px solid rgba(255,0,51,.22); color:rgba(255,0,51,.75); font-size:.38rem; text-align:center; max-width:100%; letter-spacing:.05em; }
-    .msg.amb   { align-self:flex-start; background:transparent; border:none; color:rgba(136,0,255,.45); font-size:.38rem; padding:4px 8px; }
-    .msg.ach   { align-self:center; background:rgba(0,255,65,.06); border:1px solid rgba(0,255,65,.25); color:rgba(0,255,65,.8); font-size:.38rem; text-align:center; max-width:100%; }
+    .msg.sys   { align-self:center; background:rgba(255,0,51,.06); border:1px solid rgba(255,0,51,.22); color:rgba(255,0,51,.75); font-size:clamp(.58rem,1.7vw,.72rem); text-align:center; max-width:100%; letter-spacing:.05em; }
+    .msg.amb   { align-self:flex-start; background:transparent; border:none; color:rgba(136,0,255,.45); font-size:clamp(.58rem,1.7vw,.72rem); padding:6px 9px; }
+    .msg.ach   { align-self:center; background:rgba(0,255,65,.06); border:1px solid rgba(0,255,65,.25); color:rgba(0,255,65,.8); font-size:clamp(.58rem,1.7vw,.72rem); text-align:center; max-width:100%; }
 
     /* ── TYPING ── */
     #typingWrap { display:none; align-self:flex-start; padding:10px 14px; background:rgba(136,0,255,.1); border-right:2px solid var(--p); gap:5px; align-items:center; }
@@ -272,7 +272,7 @@
     @keyframes tdot { 0%,60%,100%{transform:translateY(0);opacity:.4} 30%{transform:translateY(-6px);opacity:1} }
 
     /* ── GHOST CURSOR ── */
-    #ghostCursor { display:none; align-self:flex-start; font-family:var(--font-mono); font-size:.55rem; color:rgba(136,0,255,.5); padding:4px 8px; }
+    #ghostCursor { display:none; align-self:flex-start; font-family:var(--font-mono); font-size:.75rem; color:rgba(136,0,255,.5); padding:4px 8px; }
     #ghostCursor.on { display:block; }
 
     /* ── MIRROR MODE (ritual 75%) ── */
@@ -289,7 +289,7 @@
       border:1px solid rgba(0,255,65,.28);
       color:var(--g);
       font-family:var(--font-mono);
-      font-size: clamp(.6rem, 2vw, .72rem);
+      font-size: clamp(.85rem, 2.5vw, 1rem);
       padding:9px 10px; outline:none; caret-color:var(--g);
       transition:border-color .2s, box-shadow .2s;
       -webkit-appearance: none; border-radius:0;
@@ -300,8 +300,8 @@
       background:rgba(136,0,255,.22); color:var(--g);
       border:1px solid var(--p);
       font-family:var(--font-pixel);
-      font-size: clamp(.32rem, 1.1vw, .42rem);
-      padding:10px 12px; cursor:pointer;
+      font-size: clamp(.48rem, 1.4vw, .62rem);
+      padding:11px 13px; cursor:pointer;
       transition:background .2s, box-shadow .2s;
       white-space:nowrap; flex-shrink:0;
       -webkit-appearance: none; border-radius:0;
@@ -363,11 +363,14 @@
     ══════════════════════════════════════ */
     @media (max-width:480px) {
       #app { padding:8px 10px; justify-content:flex-start; padding-top:12px; }
-      #mainTitle { font-size:.45rem; margin-bottom:4px; }
-      .messages { height: clamp(180px, 42vh, 280px); }
+      #mainTitle { font-size:.5rem; margin-bottom:4px; }
+      .messages { height: clamp(220px, 48vh, 360px); padding: 10px; gap: 9px; }
+      .msg { font-size: .78rem; line-height: 1.65; max-width: 94%; padding: 11px 12px; }
+      .msg.sys, .msg.amb, .msg.ach { font-size: .62rem; line-height: 1.6; }
       .chat-wrap { border-width:1px; }
-      .s-bar { font-size:.42rem; }
-      #metaBar { font-size:.4rem; }
+      .s-bar { font-size:.5rem; }
+      #metaBar { font-size:.48rem; }
+      #sendBtn { padding: 11px 10px; }
     }
 
     /* safe area para iPhones con notch */

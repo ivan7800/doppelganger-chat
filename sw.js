@@ -1,5 +1,5 @@
 /* DOPPELGÄNGER PROHIBIDO — Service Worker v2.0 */
-const CACHE = 'doppelganger-v2';
+const CACHE = 'doppelganger-v3';
 const ASSETS = [
   './',
   './index.html',

@@ -11,7 +11,8 @@ Esta versión está corregida para funcionar como web estática. No depende de c
 - Motor local de respuestas: la app funciona sin backend y sin API externa.
 - Preparada para GitHub Pages: rutas relativas, `scope` correcto y service worker estable.
 - PWA reparada: se incluyen iconos reales `icon-192.png` e `icon-512.png`.
-- Caché actualizada a `doppelganger-v2` para evitar que GitHub Pages sirva una versión anterior rota.
+- Caché actualizada a `doppelganger-v3` para evitar que GitHub Pages sirva una versión anterior rota.
+- Texto del chat ampliado para mejorar legibilidad en móvil y escritorio.
 - Eliminadas fuentes externas para mejorar el modo offline.
 - Dejardada una opción futura de proxy IA mediante `API_PROXY_URL` en `index.html`.
 
