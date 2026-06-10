@@ -1,65 +1,22 @@
-# DOPPELGÄNGER PROHIBIDO v2.4 — Música del Espejo
+# DOPPELGÄNGER PROHIBIDO v3.2
 
-Experiencia web interactiva de horror psicológico, preparada para GitHub Pages.
+Versión estable para GitHub Pages con chat local, música y ecos visibles del Universo 404.
 
-## Estado de esta versión
+## Incluye
 
-Esta versión está corregida para funcionar como web estática. No depende de claves privadas ni de llamadas directas a Claude desde el navegador.
+- Chat local estable, sin API externa.
+- Música ambiental ON/OFF.
+- Ritual e integridad.
+- Comandos: `/ayuda`, `/ritual`, `/diagnostico`, `/recuerdo`, `/titulos`, `/canon404`, `/404`, `/salir`, `/reset`.
+- Ecos visibles de tus novelas:
+  - Puerta 404
+  - Reflejo 404
+  - Los hijos del mono
+  - Santa Bruna de la Carne Negra
+  - El Criterio Omega
+  - El Evangelio del Nombre Devorado
+  - La casa del ángel dormido
 
-## Cambios realizados
+## GitHub Pages
 
-- Motor local de respuestas: la app funciona sin backend y sin API externa.
-- Preparada para GitHub Pages: rutas relativas, `scope` correcto y service worker estable.
-- PWA reparada: se incluyen iconos reales `icon-192.png` e `icon-512.png`.
-- Caché actualizada a `doppelganger-v2` para evitar que GitHub Pages sirva una versión anterior rota.
-- Eliminadas fuentes externas para mejorar el modo offline.
-- Dejardada una opción futura de proxy IA mediante `API_PROXY_URL` en `index.html`.
-
-## Uso
-
-Sube estos archivos a la raíz del repositorio:
-
-```text
-index.html
-manifest.json
-sw.js
-icon-192.png
-icon-512.png
-README.md
-```
-
-Después activa GitHub Pages en:
-
-`Settings → Pages → Deploy from branch → main → /root`
-
-## Importante sobre IA real
-
-No metas una API key de Anthropic, OpenAI ni ningún proveedor dentro del HTML público. En GitHub Pages cualquiera podría verla.
-
-Si quieres IA real, crea un pequeño backend/proxy privado y pon su URL en:
-
-```js
-const API_PROXY_URL = '';
-```
-
-Mientras esté vacío, la app usará el motor local incluido.
-
-
-## v2.1
-
-Versión recomendada: combina el chat avanzado de v2 con la legibilidad aumentada de la versión de texto grande.
-
-
-## v2.3 — Ecos del Universo 404
-
-Esta versión incorpora frases y señales inspiradas en los títulos del canon de I. Roig: `Puerta 404`, `Reflejo 404`, `Los hijos del mono`, `Santa Bruna de la Carne Negra`, `El Criterio Omega`, `El Evangelio del Nombre Devorado` y `La casa del ángel dormido`.
-
-Comandos nuevos:
-
-- `/canon404`
-- `/404`
-
-Los títulos también pueden aparecer como interferencias, susurros y respuestas especiales dentro del chat.
-
-
-Nota v2.3: `Mandíbulas` se ha retirado de los ecos principales porque todavía no está escrito; así el canon visible no mezcla obra publicada/cerrada con proyecto futuro.
+Sube todos los archivos a la raíz del repositorio. Para forzar que el navegador cargue esta versión, abre la URL con `?v=32`.
